@@ -1,0 +1,2422 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HMap 2.0 엑셀 컬럼정의서 구성 예시</title>
+  <style>
+    :root {
+      --ink: #17191e;
+      --muted: #68707d;
+      --line: #d9dde4;
+      --soft: #f5f6f8;
+      --paper: #ffffff;
+      --brand: #a41f2d;
+      --brand-dark: #71131e;
+      --brand-soft: #fff1f2;
+      --normal: #277451;
+      --normal-bg: #eaf7f0;
+      --caution: #8b630b;
+      --caution-bg: #fff7df;
+      --decision: #7a3f9a;
+      --decision-bg: #f5edfa;
+      --issue: #ad3434;
+      --issue-bg: #fff0f0;
+      --limited: #4a566b;
+      --limited-bg: #edf0f5;
+      --improved: #176a7a;
+      --improved-bg: #e8f6f8;
+      --shadow: 0 18px 45px rgba(24, 30, 42, .12);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #eceff3;
+      font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      letter-spacing: -.025em;
+    }
+
+    body.locked {
+      overflow: hidden;
+      background: #e8ecf1;
+    }
+
+    body.locked > .topbar,
+    body.locked > main {
+      display: none;
+    }
+
+    .access-gate {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+      padding: 24px;
+      overflow: auto;
+      background:
+        radial-gradient(circle at 84% 16%, rgba(164, 31, 45, .12), transparent 29%),
+        radial-gradient(circle at 10% 88%, rgba(24, 95, 165, .10), transparent 27%),
+        linear-gradient(145deg, #f2f4f7, #dfe5eb);
+    }
+
+    body:not(.locked) .access-gate { display: none; }
+
+    .access-card {
+      position: relative;
+      width: min(470px, 100%);
+      overflow: hidden;
+      border: 1px solid #d2d8e0;
+      border-radius: 20px;
+      background: #fff;
+      box-shadow: 0 24px 60px rgba(31, 42, 58, .20);
+    }
+
+    .access-card-head {
+      position: relative;
+      overflow: hidden;
+      padding: 30px 32px 28px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--brand-dark), var(--brand) 70%, #c84350);
+    }
+
+    .access-card-head::after {
+      content: "";
+      position: absolute;
+      right: -54px;
+      bottom: -86px;
+      width: 190px;
+      height: 190px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 50%;
+    }
+
+    .access-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 18px;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .02em;
+    }
+
+    .access-brand .brand-mark {
+      background: #fff;
+      color: var(--brand);
+    }
+
+    .access-kicker {
+      margin-bottom: 7px;
+      color: #f0cfd3;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .access-card h1 {
+      max-width: 360px;
+      margin: 0;
+      font-size: 27px;
+      line-height: 1.25;
+      letter-spacing: -.05em;
+    }
+
+    .access-card-head p {
+      max-width: 360px;
+      margin: 12px 0 0;
+      color: #f6e6e8;
+      font-size: 13px;
+      line-height: 1.65;
+      word-break: keep-all;
+    }
+
+    .access-form {
+      padding: 28px 32px 32px;
+    }
+
+    .access-form label {
+      display: block;
+      margin-bottom: 8px;
+      color: #343944;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .access-input-row {
+      display: grid;
+      grid-template-columns: 1fr 104px;
+      gap: 8px;
+    }
+
+    .access-form input {
+      width: 100%;
+      min-width: 0;
+      height: 44px;
+      padding: 0 13px;
+      border: 1px solid #cfd4dc;
+      border-radius: 9px;
+      color: var(--ink);
+      background: #f7f8fa;
+      outline: none;
+    }
+
+    .access-form input:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(164,31,45,.11);
+    }
+
+    .access-submit {
+      border: 0;
+      border-radius: 9px;
+      color: #fff;
+      background: var(--brand);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .access-submit:hover { background: var(--brand-dark); }
+
+    .access-message {
+      min-height: 19px;
+      margin: 8px 0 0;
+      color: #a52c39;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .access-note {
+      margin: 4px 0 0;
+      color: #8a909b;
+      font-size: 10.5px;
+      line-height: 1.5;
+    }
+
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 58px;
+      padding: 0 28px;
+      color: #fff;
+      background: var(--ink);
+      box-shadow: 0 5px 18px rgba(0, 0, 0, .16);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+    }
+
+    .brand-mark {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      background: var(--brand);
+      font-size: 12px;
+      letter-spacing: 0;
+    }
+
+    .top-meta {
+      color: #c7ccd5;
+      font-size: 12px;
+    }
+
+    .page {
+      width: min(1560px, calc(100% - 40px));
+      margin: 26px auto 46px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 34px 38px 30px;
+      border-radius: 18px 18px 0 0;
+      color: #fff;
+      background:
+        radial-gradient(circle at 92% 8%, rgba(255,255,255,.15), transparent 29%),
+        linear-gradient(132deg, var(--brand-dark), var(--brand) 68%, #c84350);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -70px;
+      bottom: -115px;
+      width: 310px;
+      height: 310px;
+      border: 1px solid rgba(255,255,255,.17);
+      border-radius: 50%;
+    }
+
+    .eyebrow {
+      margin-bottom: 10px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      opacity: .8;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 3vw, 43px);
+      line-height: 1.16;
+      letter-spacing: -.055em;
+    }
+
+    .hero p {
+      max-width: 940px;
+      margin: 15px 0 0;
+      font-size: 15px;
+      line-height: 1.65;
+      opacity: .9;
+    }
+
+    .hero-lines {
+      display: grid;
+      gap: 3px;
+    }
+
+    .hero-lines span { display: block; }
+
+    .purpose-flow {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-top: 0;
+      box-shadow: var(--shadow);
+    }
+
+    .flow-item {
+      position: relative;
+      min-height: 104px;
+      padding: 24px 27px 20px;
+      border-right: 1px solid var(--line);
+    }
+
+    .flow-item:last-child { border-right: 0; }
+
+    .flow-num {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--brand);
+      font-family: Georgia, serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .1em;
+    }
+
+    .flow-item strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 15px;
+    }
+
+    .flow-item span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin: 26px 0 12px;
+    }
+
+    .tab {
+      padding: 11px 17px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      color: var(--muted);
+      background: #fff;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .tab.active {
+      border-color: var(--ink);
+      color: #fff;
+      background: var(--ink);
+    }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1.15fr repeat(6, .72fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .summary-card {
+      min-height: 118px;
+      padding: 17px 18px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--paper);
+    }
+
+    .summary-card.lead {
+      color: #fff;
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+
+    .summary-label {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .lead .summary-label { color: #bfc5cf; }
+
+    .summary-number {
+      display: block;
+      font-size: 27px;
+      font-weight: 900;
+      letter-spacing: -.05em;
+    }
+
+    .summary-note {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.48;
+      word-break: keep-all;
+    }
+
+    .lead .summary-note { color: #bfc5cf; }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(280px, 1fr) 190px auto;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-bottom: 0;
+      border-radius: 12px 12px 0 0;
+      background: var(--paper);
+    }
+
+    .toolbar input, .toolbar select {
+      width: 100%;
+      min-height: 39px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      background: var(--soft);
+      outline: none;
+    }
+
+    .toolbar input:focus, .toolbar select:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(164, 31, 45, .1);
+    }
+
+    .toolbar-note {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 4px;
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 0 0 12px 12px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    table {
+      width: 100%;
+      min-width: 1650px;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 12px;
+      line-height: 1.47;
+    }
+
+    col.no { width: 44px; }
+    col.field { width: 145px; }
+    col.definition { width: 225px; }
+    col.actual { width: 270px; }
+    col.current { width: 310px; }
+    col.impact { width: 180px; }
+    col.status { width: 145px; }
+    col.change { width: 190px; }
+    col.detail { width: 120px; }
+
+    thead th {
+      position: static;
+      z-index: 5;
+      padding: 13px 12px;
+      border-right: 1px solid #42464f;
+      color: #fff;
+      background: #25282f;
+      text-align: left;
+      font-size: 11px;
+      letter-spacing: -.01em;
+    }
+
+    tbody td {
+      padding: 13px 12px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      word-break: keep-all;
+    }
+
+    tbody tr:hover td { background: #fffafb; }
+    tbody tr:last-child td { border-bottom: 0; }
+    th:last-child, td:last-child { border-right: 0; }
+
+    .row-no {
+      color: #9aa0aa;
+      font-family: Georgia, serif;
+      font-size: 12px;
+    }
+
+    .field-name {
+      display: inline-block;
+      color: #242832;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: -.035em;
+      word-break: break-all;
+    }
+
+    .type {
+      display: block;
+      margin-top: 5px;
+      color: #9aa0aa;
+      font-size: 10px;
+    }
+
+    .definition-main {
+      display: block;
+      color: var(--ink);
+      font-weight: 800;
+    }
+
+    .expected-line {
+      display: block;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed #d9dee6;
+      color: #606a79;
+      font-size: 10.5px;
+      line-height: 1.5;
+    }
+
+    .expected-line strong {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--brand);
+      font-size: 9.5px;
+    }
+
+    .expected-guide {
+      display: grid;
+      gap: 5px;
+    }
+
+    .expected-kind {
+      display: inline-block;
+      width: fit-content;
+      padding: 3px 6px;
+      border-radius: 5px;
+      color: #4f3d74;
+      background: #f2ecfa;
+      font-size: 9.5px;
+      font-weight: 900;
+    }
+
+    .expected-row {
+      display: grid;
+      grid-template-columns: 62px 1fr;
+      gap: 6px;
+      align-items: start;
+    }
+
+    .expected-label {
+      color: #8a90a0;
+      font-size: 9.5px;
+      font-weight: 800;
+    }
+
+    .expected-value {
+      color: #313b4c;
+      font-size: 10.5px;
+      font-weight: 700;
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+    }
+
+    .change-tag {
+      display: inline-block;
+      margin: 0 0 7px;
+      padding: 3px 7px;
+      border-radius: 999px;
+      color: #764012;
+      background: #fff0d5;
+      font-size: 9.5px;
+      font-weight: 900;
+    }
+
+    .change-tag.none {
+      color: #69717f;
+      background: #eef0f3;
+    }
+
+    .change-tag.improved {
+      color: #196d45;
+      background: #e4f5eb;
+    }
+
+    .current-text strong { color: var(--brand); }
+
+    .current-note {
+      display: block;
+      margin-top: 8px;
+      padding: 7px 8px;
+      border-left: 3px solid #d7a64a;
+      border-radius: 0 5px 5px 0;
+      color: #596273;
+      background: #fff8e9;
+      font-size: 10.5px;
+      line-height: 1.5;
+    }
+
+    .current-note strong {
+      display: inline;
+      color: #8a5c00;
+    }
+
+    .actual-value {
+      display: inline-block;
+      padding: 6px 8px;
+      border: 1px solid #dce2ea;
+      border-radius: 6px;
+      color: #2e3b52;
+      background: #f2f5f9;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 10.5px;
+      line-height: 1.5;
+      letter-spacing: -.035em;
+      word-break: break-all;
+    }
+
+    .event-mini {
+      display: grid;
+      gap: 6px;
+    }
+
+    .value-guide {
+      display: block;
+      margin-bottom: 2px;
+      padding: 7px 8px;
+      border-radius: 6px;
+      color: #4e5b6f;
+      background: #f0f3f7;
+      font-size: 9.5px;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .value-guide.many {
+      color: #775000;
+      background: #fff5dc;
+    }
+
+    .value-guide strong {
+      display: block;
+      margin-bottom: 1px;
+      color: inherit;
+      font-size: 10px;
+    }
+
+    .event-mini-row {
+      padding-bottom: 6px;
+      border-bottom: 1px dashed #d9dee6;
+    }
+
+    .event-mini-row:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .event-mini-name {
+      display: block;
+      color: #687387;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 9.5px;
+      font-weight: 700;
+      line-height: 1.35;
+      word-break: break-all;
+    }
+
+    .event-mini-value {
+      display: block;
+      margin-top: 2px;
+      color: #26344a;
+      font-size: 10.5px;
+      font-weight: 800;
+      line-height: 1.4;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+
+    .event-mini-more {
+      color: var(--brand);
+      font-size: 9.5px;
+      font-weight: 800;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .badge.normal { color: var(--normal); background: var(--normal-bg); }
+    .badge.caution { color: var(--caution); background: var(--caution-bg); }
+    .badge.decision { color: var(--decision); background: var(--decision-bg); }
+    .badge.issue { color: var(--issue); background: var(--issue-bg); }
+    .badge.limited { color: var(--limited); background: var(--limited-bg); }
+    .badge.improved { color: var(--improved); background: var(--improved-bg); }
+
+    .status-cell { min-width: 0; }
+
+    .status-help {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 10.5px;
+      line-height: 1.45;
+      word-break: keep-all;
+    }
+
+    .change-date {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .detail-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 7px;
+      padding: 0;
+      border: 0;
+      color: var(--brand);
+      background: transparent;
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .detail-link::after { content: "→"; }
+
+    .detail-col {
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .detail-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 102px;
+      min-height: 32px;
+      padding: 0 8px;
+      border: 1px solid #d8aeb4;
+      border-radius: 8px;
+      color: var(--brand);
+      background: #fff7f8;
+      font-size: 10.5px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .detail-button:hover {
+      color: #fff;
+      border-color: var(--brand);
+      background: var(--brand);
+    }
+
+    .detail-shell {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      min-height: 760px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .field-nav {
+      padding: 18px 12px;
+      border-right: 1px solid var(--line);
+      background: #f4f5f7;
+    }
+
+    .field-nav h2 {
+      margin: 0 8px 12px;
+      font-size: 14px;
+    }
+
+    .field-nav-list {
+      display: grid;
+      gap: 4px;
+      max-height: 720px;
+      overflow-y: auto;
+    }
+
+    .field-nav button {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 10px 11px;
+      border: 0;
+      border-radius: 8px;
+      color: #4a505a;
+      background: transparent;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 11px;
+      font-weight: 700;
+      text-align: left;
+    }
+
+    .field-nav button:hover,
+    .field-nav button.active {
+      color: #fff;
+      background: var(--ink);
+    }
+
+    .nav-dot {
+      width: 7px;
+      height: 7px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: .72;
+    }
+
+    .detail-content { padding: 30px 34px 42px; }
+
+    .detail-heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid var(--ink);
+    }
+
+    .detail-heading h2 {
+      margin: 0;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 27px;
+      letter-spacing: -.05em;
+    }
+
+    .detail-heading p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .detail-card {
+      padding: 19px 20px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: #fff;
+    }
+
+    .detail-card.wide { grid-column: 1 / -1; }
+
+    .detail-card h3 {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: .04em;
+    }
+
+    .detail-card p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.65;
+      word-break: keep-all;
+    }
+
+    .detail-card code {
+      padding: 2px 5px;
+      border-radius: 4px;
+      color: #2e3b52;
+      background: #eef2f7;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 11px;
+      word-break: break-all;
+    }
+
+    .history {
+      margin-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    .history h3 {
+      margin: 22px 0 12px;
+      font-size: 15px;
+    }
+
+    .history-table {
+      min-width: 0;
+      table-layout: fixed;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .history-table th {
+      position: static;
+      padding: 10px;
+      background: #343841;
+    }
+
+    .history-table td {
+      padding: 11px 10px;
+      font-size: 11px;
+    }
+
+    .empty-history {
+      padding: 25px;
+      border: 1px dashed #c9cdd5;
+      border-radius: 10px;
+      color: var(--muted);
+      background: var(--soft);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .document-note {
+      margin-top: 14px;
+      padding: 17px 20px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      color: var(--muted);
+      background: #fff;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .document-note strong { color: var(--ink); }
+
+    .overview-intro { display: none; }
+    .overview-intro.active { display: block; }
+
+    .toc-stage {
+      padding: 26px 28px 30px;
+      border: 1px solid #cccbc6;
+      border-radius: 14px;
+      background: #f0efeb;
+      box-shadow: var(--shadow);
+    }
+
+    .toc-title-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .toc-title-left {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+    }
+
+    .toc-title-row h1 {
+      color: #1a1a18;
+      font-size: 24px;
+      letter-spacing: -.4px;
+    }
+
+    .toc-date {
+      padding-left: 12px;
+      border-left: 2px solid #cccbc6;
+      color: #555;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .toc-summary {
+      margin-bottom: 22px;
+      padding: 14px 20px;
+      border: 1.5px solid #cccbc6;
+      border-radius: 12px;
+      color: #1a1a18;
+      background: #e8e6df;
+      font-size: 13.5px;
+      line-height: 1.7;
+      word-break: keep-all;
+    }
+
+    .toc-purpose {
+      margin-bottom: 12px;
+      padding: 14px 18px;
+      border-left: 4px solid #185fa5;
+      border-radius: 0 10px 10px 0;
+      color: #27394d;
+      background: #eef5fb;
+      font-size: 13px;
+      line-height: 1.65;
+      word-break: keep-all;
+    }
+
+    .toc-purpose strong {
+      display: block;
+      margin-bottom: 2px;
+      color: #042c53;
+      font-size: 13.5px;
+    }
+
+    .toc-aws {
+      position: relative;
+      padding: 22px 20px 18px;
+      border: 2px dashed #b0afaa;
+      border-radius: 16px;
+      background: #e8e6df;
+    }
+
+    .toc-aws-label {
+      position: absolute;
+      top: -11px;
+      left: 20px;
+      padding: 0 8px;
+      color: #555;
+      background: #f0efeb;
+      font-size: 12.5px;
+      font-weight: 800;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+    }
+
+    .toc-db-row {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr .85fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .toc-db {
+      padding: 16px;
+      border: 2px solid;
+      border-radius: 14px;
+    }
+
+    .toc-db.blue { border-color: #185fa5; background: #d6e8f7; }
+    .toc-db.gray { border-color: #888; background: #e0dfd9; opacity: .88; }
+
+    .toc-db-head {
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1.5px solid;
+    }
+
+    .toc-db.blue .toc-db-head { border-bottom-color: #6da8e0; }
+    .toc-db.gray .toc-db-head { border-bottom-color: #b0afaa; }
+
+    .toc-db-name { font-size: 17px; font-weight: 800; }
+    .toc-db.blue .toc-db-name { color: #042c53; }
+    .toc-db.gray .toc-db-name { color: #444; }
+    .toc-db-sub { margin-top: 3px; color: #555; font-size: 12px; font-weight: 600; }
+
+    .toc-tables { display: flex; flex-direction: column; gap: 8px; }
+
+    .toc-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 9px 12px;
+      border: 1px solid;
+      border-radius: 8px;
+    }
+
+    .toc-card.blue { border-color: #6da8e0; background: #eaf3fc; }
+    .toc-card.gray { border: 1.5px dashed #b0afaa; background: #f4f3ef; }
+    .toc-card.primary {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+      padding: 14px 16px;
+      border-color: #042c53;
+      background: #185fa5;
+    }
+
+    .toc-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .toc-card-name { font-size: 14px; font-weight: 800; }
+    .toc-card.blue .toc-card-name { color: #042c53; }
+    .toc-card.gray .toc-card-name { color: #555; }
+    .toc-card.primary .toc-card-name { color: #fff; font-size: 16px; }
+
+    .toc-card-desc {
+      margin-top: 2px;
+      color: #555;
+      font-size: 12px;
+      line-height: 1.4;
+      word-break: keep-all;
+    }
+
+    .toc-card.primary .toc-card-desc { color: #d6e8f7; }
+
+    .toc-count {
+      flex: 0 0 auto;
+      padding: 3px 9px;
+      border-radius: 20px;
+      color: #042c53;
+      background: #a8cfee;
+      font-size: 11.5px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .toc-card.gray .toc-count { color: #444; background: #cccbc6; }
+    .toc-card.primary .toc-count { color: #042c53; background: #fff; }
+
+    .toc-side {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .toc-legend,
+    .toc-note {
+      padding: 14px;
+      border: 1.5px solid #cccbc6;
+      border-radius: 10px;
+      color: #444;
+      background: #f0efeb;
+      font-size: 12.5px;
+      line-height: 1.6;
+    }
+
+    .toc-small-title {
+      margin-bottom: 6px;
+      color: #555;
+      font-size: 11.5px;
+      font-weight: 800;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+    }
+
+    .toc-leg {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 7px;
+      color: #1a1a18;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .toc-dot {
+      width: 12px;
+      height: 12px;
+      flex: 0 0 auto;
+      border-radius: 3px;
+    }
+
+    .toc-events {
+      margin-top: 20px;
+      padding: 18px 22px;
+      border: 2px solid #185fa5;
+      border-radius: 16px;
+      background: #d6e8f7;
+    }
+
+    .toc-events-title {
+      margin-bottom: 10px;
+      color: #042c53;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .toc-event-row {
+      display: grid;
+      grid-template-columns: 78px 1fr;
+      gap: 14px;
+      padding: 8px 0;
+      border-top: 1px solid #a8cfee;
+    }
+
+    .toc-event-row:first-of-type { border-top: 0; }
+    .toc-event-cat { color: #185fa5; font-size: 12.5px; font-weight: 800; }
+    .toc-event-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+
+    .toc-event-chip {
+      min-width: 150px;
+      padding: 7px 10px;
+      border: 1px solid #6da8e0;
+      border-radius: 8px;
+      background: #eaf3fc;
+    }
+
+    .toc-event-name { color: #042c53; font-size: 12px; font-weight: 800; }
+    .toc-event-def { margin-top: 2px; color: #185fa5; font-size: 10.5px; }
+
+    .event-values {
+      margin-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    .event-values h3 {
+      margin: 22px 0 12px;
+      font-size: 15px;
+    }
+
+    .event-values-table {
+      min-width: 0;
+      table-layout: fixed;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .event-values-table th {
+      position: static;
+      padding: 10px;
+      background: #343841;
+    }
+
+    .event-values-table td {
+      padding: 11px 10px;
+      font-size: 11px;
+    }
+
+    @page {
+      size: A4 landscape;
+      margin: 9mm;
+    }
+
+    @media print {
+      body { background: #fff; }
+      .access-gate { display: none !important; }
+      .topbar, .tabs, .toolbar, .summary-grid, .field-nav, .detail-link { display: none !important; }
+      .page { width: 100%; margin: 0; }
+      .hero {
+        padding: 9mm 10mm 7mm;
+        border-radius: 0;
+        background: var(--brand) !important;
+      }
+      .hero h1 { font-size: 24pt; }
+      .hero p { font-size: 9pt; }
+      .purpose-flow { box-shadow: none; page-break-after: always; }
+      .flow-item { min-height: 28mm; padding: 6mm; }
+      .panel { display: block !important; }
+      #detailPanel { page-break-before: always; }
+      .table-wrap { overflow: visible; box-shadow: none; border-radius: 0; }
+      table { min-width: 0; font-size: 6.8pt; }
+      col.no { width: 3%; }
+      col.field { width: 10%; }
+      col.definition { width: 12%; }
+      col.actual { width: 15%; }
+      col.current { width: 22%; }
+      col.impact { width: 11%; }
+      col.status { width: 10%; }
+      col.change { width: 10%; }
+      col.detail { width: 7%; }
+      thead th { position: static; padding: 2mm; font-size: 6.8pt; }
+      tbody td { padding: 2mm; }
+      .detail-shell { display: block; min-height: 0; box-shadow: none; border-radius: 0; }
+      .detail-content { padding: 0; }
+      .detail-heading, .detail-grid, .history { break-inside: avoid; }
+      .document-note { display: none; }
+    }
+
+    @media (max-width: 960px) {
+      .page { width: min(100% - 20px, 1560px); margin-top: 12px; }
+      .toc-db-row { grid-template-columns: 1fr; }
+      .toc-title-row, .toc-title-left { align-items: flex-start; flex-direction: column; gap: 7px; }
+      .toc-date { border-left: 0; padding-left: 0; }
+      .purpose-flow { grid-template-columns: 1fr 1fr; }
+      .flow-item:nth-child(2) { border-right: 0; }
+      .flow-item:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .summary-grid { grid-template-columns: repeat(3, 1fr); }
+      .summary-card.lead { grid-column: 1 / -1; }
+      .detail-shell { grid-template-columns: 1fr; }
+      .field-nav { border-right: 0; border-bottom: 1px solid var(--line); }
+      .field-nav-list { grid-template-columns: repeat(3, 1fr); max-height: none; }
+    }
+
+    @media (max-width: 520px) {
+      .access-gate { padding: 14px; }
+      .access-card-head, .access-form { padding-left: 22px; padding-right: 22px; }
+      .access-input-row { grid-template-columns: 1fr; }
+      .access-submit { min-height: 42px; }
+    }
+  </style>
+</head>
+<body class="locked">
+  <section id="accessGate" class="access-gate" aria-labelledby="accessTitle">
+    <div class="access-card">
+      <div class="access-card-head">
+        <div class="access-brand"><span class="brand-mark">H2</span>HMap 2.0 데이터 관리</div>
+        <div class="access-kicker">Excel Column Definition · Preview</div>
+        <h1 id="accessTitle">HMap 2.0 엑셀 컬럼정의서 구성 예시</h1>
+        <p>필드 정의·실제 발생값·수집 상태·변경이력 구성을 미리 확인하는 화면입니다.</p>
+      </div>
+      <form id="accessForm" class="access-form" novalidate>
+        <label for="accessPassword">문서 비밀번호</label>
+        <div class="access-input-row">
+          <input id="accessPassword" type="password" autocomplete="current-password" placeholder="비밀번호를 입력하세요" aria-describedby="accessMessage">
+          <button class="access-submit" type="submit">문서 열기</button>
+        </div>
+        <p id="accessMessage" class="access-message" aria-live="polite"></p>
+        <p class="access-note">비밀번호 확인 후 대상 테이블 인덱스 화면으로 이동합니다.</p>
+      </form>
+    </div>
+  </section>
+
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">H2</span>HMap 2.0 데이터 관리</div>
+    <div class="top-meta">엑셀 컬럼정의서 구성 예시 · 기준일 2026.07.30</div>
+  </header>
+
+  <main class="page">
+    <nav class="tabs" aria-label="문서 화면 전환">
+      <button class="tab active" data-panel="indexPanel">대상 테이블 인덱스</button>
+      <button class="tab" data-panel="overviewPanel">대표 현황표</button>
+      <button class="tab" data-panel="detailPanel">필드 상세·변경이력</button>
+    </nav>
+
+    <section id="indexPanel" class="panel active toc-stage">
+      <div class="toc-title-row">
+        <div class="toc-title-left">
+          <h1>HMAP 2.0 엑셀 컬럼정의서 구성 예시 — 대상 테이블 인덱스</h1>
+          <span class="toc-date">2026년 7월 24일 기준</span>
+        </div>
+      </div>
+
+      <div class="toc-purpose">
+        <strong>최종 엑셀 작성 전에 전체 구성과 내용을 확인하기 위한 예시 화면입니다.</strong>
+        대상 테이블, 대표 현황, 필드별 실제값과 변경이력 순서로 구성했습니다.
+      </div>
+
+      <div class="toc-summary">
+        AWS Athena에는 <strong>hmap-db</strong>, <strong>hk_home</strong>, <strong>s3logs_hmap</strong> 3개의
+        스키마(데이터베이스)가 있습니다. 이번 정의서의 대상은 hmap-db 소속 <strong>hmap_rawdata</strong> 하나입니다.
+        독자 실시간 행동 로그 원본으로 <strong>81개 컬럼</strong>·<strong>15종 수집 이벤트</strong>로 구성됩니다.
+        hk_home과 그 외 테이블은 참고용이며, s3logs_hmap은 IAM 권한 미부여로 조회할 수 없습니다.
+      </div>
+
+      <div class="toc-aws">
+        <span class="toc-aws-label">AWS Athena · ap-northeast-2</span>
+        <div class="toc-db-row">
+          <div class="toc-db blue">
+            <div class="toc-db-head">
+              <div class="toc-db-name">hmap-db</div>
+              <div class="toc-db-sub">행동 분석 핵심 DB</div>
+            </div>
+            <div class="toc-tables">
+              <div class="toc-card primary">
+                <div class="toc-card-top">
+                  <div class="toc-card-name">hmap_rawdata</div>
+                  <div class="toc-count">81개 컬럼</div>
+                </div>
+                <div class="toc-card-desc">독자 실시간 행동 로그 원본 · 정의서 작성 대상</div>
+              </div>
+              <div class="toc-card blue">
+                <div><div class="toc-card-name">hmap_hourly_pv_count</div><div class="toc-card-desc">기사별 시간 단위 PV 집계</div></div>
+                <div class="toc-count">집계</div>
+              </div>
+              <div class="toc-card blue">
+                <div><div class="toc-card-name">hmap_herb_bottom_top10</div><div class="toc-card-desc">추천 영역 노출 상위 10건</div></div>
+                <div class="toc-count">집계</div>
+              </div>
+              <div class="toc-card blue">
+                <div><div class="toc-card-name">hmap-article-info</div><div class="toc-card-desc">기사 메타 정보</div></div>
+                <div class="toc-count">메타</div>
+              </div>
+              <div class="toc-card blue">
+                <div><div class="toc-card-name">depart_mapping</div><div class="toc-card-desc">부서 코드 참조표</div></div>
+                <div class="toc-count">참조</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="toc-db gray">
+            <div class="toc-db-head">
+              <div class="toc-db-name">hk_home</div>
+              <div class="toc-db-sub">서비스 반응 데이터 · 정의서 미진행</div>
+            </div>
+            <div class="toc-tables">
+              <div class="toc-card gray"><div><div class="toc-card-name">article_opinion</div><div class="toc-card-desc">기사 댓글 원문·반응</div></div><div class="toc-count">19개 컬럼</div></div>
+              <div class="toc-card gray"><div><div class="toc-card-name">opinion_sympathy</div><div class="toc-card-desc">댓글 좋아요·신고 이력</div></div><div class="toc-count">13개 컬럼</div></div>
+              <div class="toc-card gray"><div><div class="toc-card-name">user_activity</div><div class="toc-card-desc">회원 서비스 행동 이력</div></div><div class="toc-count">10개 컬럼</div></div>
+              <div class="toc-card gray"><div><div class="toc-card-name">event_participant</div><div class="toc-card-desc">이벤트 참여 내역</div></div><div class="toc-count">참여</div></div>
+            </div>
+          </div>
+
+          <div class="toc-side">
+            <div class="toc-db gray">
+              <div class="toc-db-head">
+                <div class="toc-db-name">s3logs_hmap</div>
+                <div class="toc-db-sub">정의서 대상 제외</div>
+              </div>
+              <div class="toc-card gray">
+                <div><div class="toc-card-name">access_logs_hmap 외 3건</div><div class="toc-card-desc">S3 버킷 접근 로그</div></div>
+                <div class="toc-count">조회 불가</div>
+              </div>
+            </div>
+            <div class="toc-legend">
+              <div class="toc-small-title">범례</div>
+              <div class="toc-leg"><span class="toc-dot" style="background:#6da8e0"></span>hmap_rawdata — 정의서 진행</div>
+              <div class="toc-leg"><span class="toc-dot" style="background:#b0afaa;border:1px dashed #888"></span>hk_home, s3logs_hmap — 정의서 미진행</div>
+            </div>
+            <div class="toc-note">
+              <div class="toc-small-title">이 문서의 목적</div>
+              <strong>hmap_rawdata</strong> 81개 컬럼의 정의값·실측값·영향 지표·변경이력을 한눈에 보여줍니다.
+              현재 21개 컬럼을 우선 작성한 상태이며, 이후 같은 구조로 확장합니다.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="toc-events">
+        <div class="toc-events-title">hmap_rawdata 수집 이벤트 15종</div>
+        <div class="toc-event-row">
+          <div class="toc-event-cat">기사소비</div>
+          <div class="toc-event-chips">
+            <div class="toc-event-chip"><div class="toc-event-name">session_start2</div><div class="toc-event-def">세션 시작</div></div>
+            <div class="toc-event-chip"><div class="toc-event-name">page_view2</div><div class="toc-event-def">페이지 로드</div></div>
+            <div class="toc-event-chip"><div class="toc-event-name">article_complete2</div><div class="toc-event-def">기사 완독</div></div>
+            <div class="toc-event-chip"><div class="toc-event-name">article_fever2</div><div class="toc-event-def">기사 몰입 구간 진입</div></div>
+          </div>
+        </div>
+        <div class="toc-event-row">
+          <div class="toc-event-cat">클릭</div>
+          <div class="toc-event-chips">
+            <div class="toc-event-chip"><div class="toc-event-name">click_in_article2</div><div class="toc-event-def">기사 내부 영역 클릭</div></div>
+            <div class="toc-event-chip"><div class="toc-event-name">click_non_article2</div><div class="toc-event-def">비기사 영역 클릭</div></div>
+            <div class="toc-event-chip"><div class="toc-event-name">click_out_article2</div><div class="toc-event-def">기사 밖(홈·외부) 이동 클릭</div></div>
+          </div>
+        </div>
+        <div class="toc-event-row">
+          <div class="toc-event-cat">스크롤</div>
+          <div class="toc-event-chips">
+            <div class="toc-event-chip"><div class="toc-event-name">scroll2</div><div class="toc-event-def">메인 페이지 스크롤</div></div>
+            <div class="toc-event-chip"><div class="toc-event-name">article_scroll2</div><div class="toc-event-def">기사 페이지 스크롤</div></div>
+          </div>
+        </div>
+        <div class="toc-event-row">
+          <div class="toc-event-cat">회원</div>
+          <div class="toc-event-chips">
+            <div class="toc-event-chip"><div class="toc-event-name">login2</div><div class="toc-event-def">로그인</div></div>
+            <div class="toc-event-chip"><div class="toc-event-name">logout2</div><div class="toc-event-def">로그아웃</div></div>
+            <div class="toc-event-chip"><div class="toc-event-name">sign_up2</div><div class="toc-event-def">회원가입</div></div>
+            <div class="toc-event-chip"><div class="toc-event-name">sign_out2</div><div class="toc-event-def">회원탈퇴</div></div>
+          </div>
+        </div>
+        <div class="toc-event-row">
+          <div class="toc-event-cat">영상</div>
+          <div class="toc-event-chips">
+            <div class="toc-event-chip"><div class="toc-event-name">video_start2</div><div class="toc-event-def">영상 재생 시작</div></div>
+            <div class="toc-event-chip"><div class="toc-event-name">video_end2</div><div class="toc-event-def">영상 재생 종료</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div id="overviewIntro" class="overview-intro">
+    <section class="hero">
+      <div class="eyebrow">Excel Column Definition · Preview</div>
+      <h1>HMap 2.0 엑셀 컬럼정의서 예비안</h1>
+      <p class="hero-lines">
+        <span>필드 정의·정상값·실제 수집 상태·분석 유의사항·변경이력을 한 화면에 정리했습니다.</span>
+        <span>최종 엑셀 작성 전에 전체 구성과 내용을 확인하기 위한 예시 화면입니다.</span>
+      </p>
+    </section>
+
+    <section class="purpose-flow" aria-label="문서 구성 흐름">
+      <div class="flow-item"><span class="flow-num">01</span><strong>필드 정의</strong><span>무엇을 담으며 언제 만들어지는 값인지 정리합니다.</span></div>
+      <div class="flow-item"><span class="flow-num">02</span><strong>기대값·수집 이벤트</strong><span>정상 값의 형태와 실제 발생값을 확인합니다.</span></div>
+      <div class="flow-item"><span class="flow-num">03</span><strong>현재 수집 현황</strong><span>누락·혼재·정상 여부와 분석 시 확인할 사항을 기록합니다.</span></div>
+      <div class="flow-item"><span class="flow-num">04</span><strong>변경이력 추적</strong><span>개발 작업 전후 값의 변화와 검증 결과를 상세 화면에 축적합니다.</span></div>
+    </section>
+    </div>
+
+    <section id="overviewPanel" class="panel">
+      <div id="summaryGrid" class="summary-grid"></div>
+
+      <div class="toolbar">
+        <input id="searchInput" type="search" placeholder="컬럼명·정의·수집 현황 검색">
+        <select id="statusFilter" aria-label="상태 필터">
+          <option value="">전체 상태</option>
+          <option value="정상">정상 수집</option>
+          <option value="유의사항">해석 유의</option>
+          <option value="기준 확인">기준 미확정</option>
+          <option value="수집 이상">누락·오수집</option>
+          <option value="활용 제한">분석 활용 어려움</option>
+          <option value="개선 반영">개선 후 안정화</option>
+        </select>
+        <div class="toolbar-note">행의 ‘변경이력 상세’에서 필드별 기록 확인</div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <colgroup>
+            <col class="no"><col class="field"><col class="definition"><col class="actual">
+            <col class="current"><col class="impact"><col class="status"><col class="change"><col class="detail">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>No.</th>
+              <th>컬럼명</th>
+              <th>한 줄 정의·정상 수집 기준</th>
+              <th>수집 이벤트별 발생값</th>
+              <th>현재 수집 현황·확인할 내용</th>
+              <th>영향받는 지표</th>
+              <th>수집·활용 판단</th>
+              <th>변경 이력</th>
+              <th>상세</th>
+            </tr>
+          </thead>
+          <tbody id="fieldTableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="document-note">
+        <strong>변경 이력 관리</strong> — 값의 형식이나 수집 기준이 달라진 시점을 기록하여 이전 데이터와 현재 데이터를
+        같은 기준으로 볼 수 있는지 확인합니다. 대표 현황표에는 가장 최근 변경만 표시하며, 작업 내용·변경 전후 실제값·검증 결과는
+        최종 엑셀의 별도 변경이력 시트에 누적합니다.
+      </div>
+    </section>
+
+    <section id="detailPanel" class="panel">
+      <div class="detail-shell">
+        <aside class="field-nav">
+          <h2>필드 목록</h2>
+          <div id="fieldNavList" class="field-nav-list"></div>
+        </aside>
+        <article id="detailContent" class="detail-content"></article>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const fields = [
+      {
+        name: "author_name", definition: "기사에 연결되는 기자·필자명", status: "기준 확인",
+        current: "기사 화면에 여러 기자가 표시돼도 HMap에는 HERB의 <strong>담당 기자(writer) 한 명</strong>만 저장됩니다. 공동기사의 조회수도 화면에 표시된 모든 기자가 아니라 담당 기자 한 명에게만 연결됩니다.",
+        impact: "기자별 기사 수·조회수, 공동기고 실적",
+        events: "기사 소비·클릭·페이지 조회·영상 이벤트",
+        expected: "기사에서 공식적으로 집계할 기자명입니다. 대표 기자 또는 공동기고 포함 여부는 운영 기준으로 확정돼야 합니다.",
+        example: "화면: 김형준 → HMap: 강주형 / 화면: 최서진·김준형 → HMap: 최서진",
+        check: "담당 기자 기준을 유지할지, 화면 바이라인 기준으로 변경할지 결정이 남아 있습니다.",
+        change: "2026.07.28 개발팀 회신으로 실제 수집 기준이 HERB 담당 기자(writer)임을 확인",
+        history: [
+          ["2026.07.23", "화면·DOM·GTM·전송값 비교", "김형준", "전송값 강주형", "값이 달라지는 구간 조사"],
+          ["2026.07.28", "개발팀 수집 기준 회신", "바이라인 참조 추정", "HERB 담당 기자(writer) 참조", "기준 확인 완료·운영 결정 대기"]
+        ]
+      },
+      {
+        name: "article_type", definition: "일반·단독·속보·현장·링크 등의 기사유형", status: "유의사항",
+        current: "같은 일반기사도 기사 소비 이벤트에는 <strong>일반</strong>, 페이지 조회·클릭 이벤트에는 <strong>General</strong>로 저장됩니다. 서로 다른 유형이 아니라 이벤트에 따라 표기 언어만 달라지는 값이며, 반대 언어가 들어온 소량의 예외값도 있습니다.",
+        impact: "기사유형별 조회·클릭·완독 비교",
+        events: "기사 소비·클릭·페이지 조회",
+        expected: "일반/General, 단독/Exclusive, 속보/Speed, 현장/Scene, 링크/Link가 이벤트 계열에 맞는 언어로 들어와야 합니다.",
+        example: "같은 일반 유형: page_view2=General, article_scroll2=일반",
+        check: "한글·영문 대응 규칙을 전제로 분석해야 하며 결측과 반대 그룹 값은 별도로 확인합니다.",
+        change: "현재까지 확정된 개발 변경이력 없음",
+        history: []
+      },
+      {
+        name: "click_class", definition: "클릭된 화면 요소의 class 속성값", status: "활용 제한",
+        current: "Tailwind 전환 후 <strong>px-16, pb-24, rounded, transition-colors</strong>처럼 위치·여백·모양을 나타내는 디자인값이 저장됩니다. 기사 내부 클릭에서만 10,942종이 확인돼 현재 값만으로는 기사 제목, 로그인 버튼, 추천기사 중 무엇을 클릭했는지 알기 어렵습니다.",
+        impact: "추천·관련·버튼 등 클릭 영역별 집계",
+        events: "click_in_article2, click_non_article2, click_out_article2",
+        expected: "클릭 위치를 식별할 수 있는 의미 있는 클래스명이나 별도 구분값이 들어와야 합니다.",
+        example: "bg-reverse-common-100 relative z-100 transition-colors … px-16 pb-24 sm:px-32",
+        check: "수집값만으로 어떤 요소를 클릭했는지 구분하기 어렵고, 별도 세팅된 값에 의존합니다.",
+        change: "2026.01.28 Tailwind 전환 / 2026.03 추천 클릭 구분값 반영",
+        history: [
+          ["2026.01.28", "프론트엔드 Tailwind 전환", "의미 있는 CSS 클래스", "디자인 유틸리티 클래스", "click_class 종류 급증"],
+          ["2026.03", "추천 클릭 구분값 반영", "rec_ 계열", "rec- 계열", "추천 클릭 구분 기준 변경"]
+        ]
+      },
+      {
+        name: "click_text", definition: "클릭한 버튼·링크에 표시된 문구", status: "수집 이상",
+        current: "기사 내부 클릭 100건 중 약 45건은 ‘로그인’이나 ‘추천기사 제목’ 같은 한 개 클릭 문구가 아니라 <strong>기사 본문 전체 문자열</strong>이 저장됩니다. 비기사 클릭에는 ‘홈로그인검색전체메뉴’처럼 여러 문구가 붙어 들어오고, 기사 밖 이동 클릭 100건 중 약 46건은 값이 비어 있습니다.",
+        impact: "클릭 요소별 집계, 클릭 문구 분석",
+        events: "click_in_article2, click_non_article2, click_out_article2",
+        expected: "사용자가 실제로 클릭한 한 개 요소의 표시 문구가 들어와야 합니다.",
+        example: "정상: 로그인 / 이상: 홈로그인검색전체메뉴 또는 기사 본문 전체",
+        check: "클릭 이벤트 자체는 있으나 click_text가 클릭 대상을 대표하지 않는 사례가 많다.",
+        change: "현재까지 확정된 개발 변경이력 없음",
+        history: []
+      },
+      {
+        name: "click_page_url", definition: "클릭 후 이동하는 목적지 URL", status: "수집 이상",
+        current: "기사 내부 클릭 100건 중 약 <strong>95건</strong>, 비기사 화면 클릭 100건 중 약 <strong>37건</strong>, 기사 밖 이동 클릭 100건 중 약 <strong>35건</strong>은 목적지 URL이 비어 있습니다. 이동이 없는 이미지 확대와 실제 링크 이동에서 URL이 누락된 경우가 같은 빈값으로 남습니다.",
+        impact: "클릭 후 이동경로·기사 간 이동 분석",
+        events: "기사 내부 클릭·비기사 화면 클릭·기사 밖 이동 클릭",
+        expected: "기사 내부 클릭에는 본문 링크·추천기사 URL, 비기사 클릭에는 메인·섹션·로그인 URL, 기사 밖 클릭에는 홈·유튜브·SNS 목적지 URL이 들어와야 합니다.",
+        example: "click_in_article2=/news/article/... / click_non_article2=/search, /news/opinion / click_out_article2=/auth/login, YouTube",
+        check: "이미지 확대·기자정보처럼 원래 이동이 없는 클릭과 실제 링크 이동이 같은 이벤트 안에 섞여 있습니다.",
+        change: "현재까지 확정된 개발 변경이력 없음",
+        history: []
+      },
+      {
+        name: "join_id", definition: "회원을 식별하는 통합회원번호", status: "기준 확인",
+        current: "<strong>HKYCWETZZU6G</strong>처럼 HK로 시작하는 12자리 코드와 <strong>b6729ca8-e4a4-46a7-8ecd-6dbb9833cf7f</strong> 같은 UUID가 함께 저장됩니다. 두 형식이 어떤 기준으로 나뉘는지 확인되지 않아 같은 회원 기준으로 연결해도 되는지 판단하기 어렵습니다.",
+        impact: "회원 식별·Salesforce 데이터 결합",
+        events: "로그인·로그아웃·회원가입 및 일부 공통 이벤트",
+        expected: "동일 회원이 여러 세션과 시스템에서 일관되게 연결되는 식별값이 들어와야 합니다.",
+        example: "HKYCWETZZU6G / b6729ca8-e4a4-46a7-8ecd-6dbb9833cf7f",
+        check: "Athena join_id, Salesforce Contact IntegratedMemberNo__c, 테이블 integrated_id 명칭도 함께 정리돼야 합니다.",
+        change: "시스템별 통합회원번호 명칭이 서로 다름",
+        history: []
+      },
+      {
+        name: "click_headline", definition: "클릭한 콘텐츠의 제목", status: "수집 이상",
+        current: "클릭한 기사 제목이 들어와야 하지만 일부 비기사 클릭에는 <strong>기사 본문 전체 문자열이나 HTML 태그</strong>가 저장됩니다. 그대로 제목별 클릭 수를 집계하면 실제 기사 제목이 아닌 값도 함께 포함됩니다.",
+        impact: "비기사 화면 콘텐츠 제목별 클릭 집계",
+        events: "click_in_article2, click_non_article2",
+        expected: "사용자가 클릭한 기사·콘텐츠의 제목 한 건이 들어와야 합니다.",
+        example: "정상: 기사 제목 / 이상: 본문 문장 전체·HTML 문자열",
+        check: "click_class가 비어 있거나 특정 구형 클래스일 때 본문이 제목으로 수집되는 사례가 확인됐습니다.",
+        change: "현재까지 확정된 개발 변경이력 없음",
+        history: []
+      },
+      {
+        name: "click_article_id", definition: "클릭해 이동할 대상 기사의 ID", status: "정상",
+        current: "예를 들어 목적지 URL에 포함된 기사 ID가 <strong>201908271065715262</strong>이면 click_article_id에도 같은 값이 저장됩니다. 현재 확인 범위에서는 목적지 기사 ID와 일치합니다.",
+        impact: "클릭 대상 기사 식별",
+        events: "click_in_article2, click_non_article2",
+        expected: "click_article_id는 클릭 목적지 기사의 article_id와 일치해야 합니다.",
+        example: "201908271065715262",
+        check: "현재 정상 수집",
+        change: "변경이력 없음",
+        history: []
+      },
+      {
+        name: "click_article_edit", definition: "클릭이 발생한 화면 내 편집·섹션 위치", status: "수집 이상",
+        current: "기사 화면에는 <strong>관련영역·플로팅추천영역·탐사보도</strong> 등 13종, 메인 화면에는 <strong>메인주요기사2·메인프리미엄</strong> 등 19종의 위치값이 저장됩니다. 일부 값은 이름에 정의된 위치와 실제 클릭 위치가 다르게 확인됩니다.",
+        impact: "영역·섹션별 클릭 집계",
+        events: "click_in_article2, click_non_article2",
+        expected: "기사 화면 또는 메인 화면에서 정의한 한 개의 위치값이 들어와야 합니다.",
+        example: "관련영역, 플로팅추천영역, 탐사보도 / 메인주요기사2, 메인프리미엄 등",
+        check: "기사 영역 시트·메인 영역 시트의 정의값과 실제 페이지 구조를 함께 봐야 합니다.",
+        change: "2026.07.21 기사 영역 시트 기준 점검 / 2026.07.27 탐사보도 실제 위치 확인",
+        history: [
+          ["2026.07.21", "기사 영역 정의표 점검", "영역 시트 기준", "실제 페이지 위치 대조", "하단 영역 차이 확인"],
+          ["2026.07.27", "탐사보도 위치 확인", "하단7영역 추정", "기획 페이지 구조 확인", "영역 정의 재검토 필요"]
+        ]
+      },
+      {
+        name: "content_category", definition: "기사의 섹션·카테고리명", status: "정상",
+        current: "article_id가 존재하는 이벤트에는 해당 섹션명이 채워지고, article_id가 없는 경우에는 비어 있는 정상 구조다.",
+        impact: "섹션별 조회수·완독률",
+        events: "기사 소비·클릭·페이지 조회·영상",
+        expected: "문화·사회·정치·경제·라이프 등 해당 기사의 실제 섹션명이 들어와야 합니다.",
+        example: "문화, 사회, 정치, 경제, 라이프, 국제, 지역, 스포츠, 오피니언 등",
+        check: "섹션·코너가 고정 목록이 아니라 신규 생성될 수 있다는 점은 정상 범위다.",
+        change: "변경이력 없음",
+        history: []
+      },
+      {
+        name: "first_puble_time", definition: "콘텐츠가 최초 발행된 시각", status: "정상",
+        current: "전체적으로 정상이며 article_id 단위로 최초 발행시각이 유지됩니다. 다만 session_start2에서는 article_id가 거의 없는데도 값이 채워져 <strong>참조 기준이 불분명한 일부 사례</strong>가 있습니다.",
+        impact: "발행 후 경과시간·시간대별 성과",
+        events: "세션·기사 소비·클릭·페이지 조회·영상",
+        expected: "기사는 HHMM00, 영상은 HHMMSS 형식이며 동일 article_id에는 같은 최초 발행시각이 들어와야 합니다.",
+        example: "15:56:00, 08:26:00 / 영상 17:33:02, 20:14:23",
+        check: "현재 정상 수집됩니다. 일부 이벤트의 채움 비율은 article_id 존재 여부와 함께 해석합니다.",
+        change: "변경이력 없음",
+        history: []
+      },
+      {
+        name: "last_puble_time", definition: "콘텐츠가 최종 수정된 시각", status: "정상",
+        current: "전체적으로 정상이며 기사 수정 이력에 따라 같은 article_id에서 여러 시각이 나타납니다. 다만 session_start2에서는 article_id 없이 값이 채워지는 사례가 있어 <strong>값의 출처는 별도 확인이 필요</strong>합니다.",
+        impact: "기사 수정 전후 경과시간·성과",
+        events: "세션·기사 소비·클릭·페이지 조회·영상",
+        expected: "수정이 없으면 최초 발행시각과 같은 값, 수정이 있으면 실제 최종 수정시각이 들어와야 합니다.",
+        example: "10:44:00, 15:56:00",
+        check: "여러 값이 존재하는 것은 기사 수정 이력을 반영한 정상 구조다.",
+        change: "변경이력 없음",
+        history: []
+      },
+      {
+        name: "article_length", definition: "기사 본문의 글자 수", status: "유의사항",
+        current: "같은 article_id도 본문 수정 이력에 따라 여러 값이 나올 수 있고, 화면 GTM 값을 별도 계산 없이 그대로 수집합니다.",
+        impact: "기사 길이 대비 열독률·완독률",
+        events: "세션·기사 소비·클릭·페이지 조회·영상",
+        expected: "이벤트가 발생한 시점의 실제 본문 글자 수가 들어와야 합니다.",
+        example: "972, 1483, 13",
+        check: "한 기사에 하나의 고정 길이를 기대하지 말고 수정 시점과 함께 해석해야 합니다.",
+        change: "변경이력 없음",
+        history: []
+      },
+      {
+        name: "gtm_uniqueeventid", definition: "GTM에서 넘어오는 이벤트 처리 식별값", status: "활용 제한",
+        current: "실제 값으로는 <strong>72</strong> 같은 숫자나 UUID가 들어오지만, page_view2의 약 <strong>0.2%</strong>와 session_start2의 약 <strong>0.02%</strong>에만 값이 있습니다. 값이 있는 일부 세션에서도 같은 값이 반복돼 개별 이벤트의 고유번호로 사용하기 어렵습니다.",
+        impact: "현재 직접 활용 지표 없음",
+        events: "대부분 이벤트",
+        expected: "개별 이벤트를 구분할 수 있도록 이벤트마다 서로 다른 값이 들어와야 합니다.",
+        example: "72, UUID 형식 값 등 복수 형태",
+        check: "일부 이벤트에서는 한 세션 안에서 값이 반복돼 이벤트 고유 식별값으로 쓰기 어렵습니다.",
+        change: "현재까지 확정된 개발 변경이력 없음",
+        history: []
+      },
+      {
+        name: "article_id", definition: "게시 콘텐츠를 식별하는 고유 ID", status: "유의사항",
+        current: "과거 기사에는 <strong>201612011189539024</strong> 같은 숫자형 ID가 저장되고, 현재 기사에는 <strong>A2024091215180001091</strong>처럼 A로 시작하는 ID가 저장됩니다. 2020년 7월 전후 형식이 전환됐으며 두 값 모두 정상 역사 데이터입니다.",
+        impact: "기사별 조회수·완독률·체류시간 집계",
+        events: "기사 소비·클릭·페이지 조회·영상",
+        expected: "현재 기사는 A+20자리, 영상은 V+21자리이며 과거 콘텐츠에는 숫자형 ID가 들어옵니다.",
+        example: "A2024091215180001091 / 201612011189539024",
+        check: "두 형식 모두 정상 역사 데이터이며, 전환기 예외값만 구분해 봐야 합니다.",
+        change: "2020.07 숫자형에서 A/V 구분형으로 전환",
+        history: [
+          ["2020.06~07", "기사 ID 형식 전환", "숫자형", "기사 A·영상 V 시작 형식", "전환기 두 형식 혼재"],
+          ["2026.07", "과거값 범위 확인", "-", "가장 오래된 기사 1992.11.14 확인", "역사 데이터 범위 정리"]
+        ]
+      },
+      {
+        name: "feature_type", definition: "로그인월·페이월 콘텐츠 여부", status: "유의사항",
+        current: "현재 실제 발생값은 <strong>loginWall</strong>과 <strong>no</strong> 두 가지입니다. 로그인월이 노출되면 loginWall, 노출되지 않으면 no가 저장되며 yes 값은 확인되지 않습니다.",
+        impact: "로그인월 노출·로그인·구독 전환율",
+        events: "페이지 조회·클릭·기사 내부 행동",
+        expected: "로그인월이 노출되면 loginWall, 노출되지 않으면 no가 들어와야 합니다.",
+        example: "loginWall / no",
+        check: "두 값으로 운영되는 현재 기준 자체는 이상이 아니며 정의에 맞춰 사용하면 됩니다.",
+        change: "2026.01 loginWall 값 발생 시작",
+        history: [
+          ["2026.01", "로그인월 기능 반영", "발생값 없음", "loginWall 발생", "로그인월 관련 지표 산출 가능"]
+        ]
+      },
+      {
+        name: "last_puble_date", definition: "콘텐츠가 최종 수정된 날짜", status: "정상",
+        current: "대부분 <strong>2023/02/01</strong>처럼 YYYY/MM/DD 형식으로 저장됩니다. 다만 <strong>Invalid Date 75건</strong>과 날짜 대신 기사 ID 문자열이 들어간 값 4건이 확인됩니다. 전체 비율은 매우 작지만 이상값이 전혀 없는 필드는 아닙니다.",
+        impact: "현재 직접 영향 낮음",
+        events: "기사 소비·클릭·페이지 조회·세션·영상",
+        expected: "YYYY/MM/DD 형식의 실제 최종 수정일이 들어와야 합니다.",
+        example: "2023/02/01 / Invalid Date / A2025…",
+        check: "오류값 비율이 매우 낮아 대표 지표 영향보다 데이터 품질 이력으로 남깁니다.",
+        change: "현재까지 확정된 개발 변경이력 없음",
+        history: []
+      },
+      {
+        name: "event_date", definition: "이벤트가 발생한 날짜·파티션 키", status: "정상",
+        current: "대부분 <strong>20260730</strong>처럼 YYYYMMDD 8자리로 저장됩니다. 다만 <strong>NaNNaNNa 129건</strong>과 미래 날짜 4,025건이 확인됐으며 전체의 약 0.00008%입니다. 정상 필드로 분류하지만 예외값도 함께 기록합니다.",
+        impact: "날짜별 이벤트 집계·조회 기간 구분",
+        events: "대부분 이벤트",
+        expected: "이벤트가 발생한 날짜가 YYYYMMDD 8자리 숫자로 들어와야 합니다.",
+        example: "20260730 / NaNNaNNa / 미래 날짜",
+        check: "전체 대비 약 0.00008% 수준의 예외값으로, 발생 원인과 비율을 함께 기록합니다.",
+        change: "현재까지 확정된 개발 변경이력 없음",
+        history: []
+      },
+      {
+        name: "hk_type", definition: "사용자가 접속한 플랫폼 유형", status: "유의사항",
+        current: "기존 iOS·AOS·PC·모바일웹 외에 <strong>MOW·mobilweb·오버웹</strong> 등 신규·비정형 값이 확인됩니다. MOW 8,494건 중 8,492건은 Macintosh 환경입니다.",
+        impact: "디바이스 접속 비중·이용행태",
+        events: "대부분 이벤트",
+        expected: "정의된 플랫폼값인 iOS, AOS, PC, 모바일웹 중 하나가 들어와야 합니다.",
+        example: "MOW 26,164건, mobilweb 13건, 오버웹 2건",
+        check: "디바이스 기준 분류와 실제 OS 환경의 관계를 함께 봐야 합니다.",
+        change: "2026.01 MOW 값 발생 시작",
+        history: [
+          ["2026.01", "신규 hk_type 값 유입", "iOS·AOS·PC·모바일웹", "MOW 추가", "Macintosh 환경에서 집중 발생"]
+        ]
+      },
+      {
+        name: "operating_system", definition: "사용자 기기의 운영체제 정보", status: "개선 반영",
+        current: "실제 값이 Android·Android OS, iOS·Apple iOS처럼 서로 다른 표기로 저장됩니다. 과거에는 운영체제명이 잘못 연결된 비율이 높았으나 2026년 2월 이후 <strong>0.05% 이하</strong>로 감소했습니다.",
+        impact: "OS별 접속 비중",
+        events: "대부분 이벤트",
+        expected: "Android, iOS, Windows, Macintosh, Chrome OS, Linux 등 실제 운영체제명이 들어와야 합니다.",
+        example: "Android, Android OS, iOS, Apple iOS, Windows NT, Mac OS",
+        check: "현재는 대부분 정상명으로 들어오지만 과거 구간에는 다른 OS명이 섞인 이력이 있습니다.",
+        change: "2026.02 OS 표기 오류 개선 반영",
+        history: [
+          ["2026.01 이전", "OS명 수집", "Android OS·Apple iOS 오매핑 70~90%", "-", "과거 데이터 주의"],
+          ["2026.02 이후", "OS 매핑 개선", "오매핑 다수", "오매핑 0.05% 이하", "현재 대부분 정상"]
+        ]
+      },
+      {
+        name: "operating_system_version", definition: "사용자 기기 OS의 버전 정보", status: "개선 반영",
+        current: "버전 자리에 Android OS·Apple iOS 같은 <strong>운영체제명</strong>이 들어온 이력이 있습니다. 2026년 2월 이후 오류 비율은 0.05% 이하로 감소했습니다.",
+        impact: "OS 버전별 접속 비중",
+        events: "대부분 이벤트",
+        expected: "Android 10, iOS 18.7, Windows 10처럼 OS명과 버전번호를 함께 확인할 수 있는 값이 들어와야 합니다.",
+        example: "정상: Android 10, iOS 18.7 / 이상: Android OS, Apple iOS",
+        check: "버전값에는 숫자를 포함한 버전 형식이 들어와야 하며 운영체제명만 단독으로 들어올 수 없습니다.",
+        change: "2026.02 OS 버전 표기 오류 개선 반영",
+        history: [
+          ["2026.01 이전", "OS 버전 수집", "운영체제명만 입력된 값 730건", "-", "버전별 분석 제한"],
+          ["2026.02 이후", "버전 매핑 개선", "Android OS·Apple iOS", "Android 10·iOS 18.7 등", "오류 0.05% 이하"]
+        ]
+      }
+    ];
+
+    const eventValueMap = {
+      author_name: [
+        ["기사 화면", "김형준", "화면에 표시된 바이라인"],
+        ["page_view2 등 HMap 전송값", "강주형", "같은 기사의 HERB 담당 기자(writer)"],
+        ["공동기사 화면", "최서진 · 김준형", "화면에 표시된 두 기자"],
+        ["공동기사 HMap 전송값", "최서진", "HERB 담당 기자 한 명만 저장"]
+      ],
+      article_type: [
+        ["article_complete2 · article_fever2 · article_scroll2", "일반 · 단독 · 속보 · 현장 · 링크", "한글 표기"],
+        ["click_in_article2 · click_out_article2 · page_view2", "General · Exclusive · Speed · Scene · Link", "영문 표기"],
+        ["session_start2", "원칙상 공란", "139건의 예외값 확인"]
+      ],
+      click_class: [
+        ["click_in_article2", "bg-reverse-common-100 relative z-100 transition-colors", "실제 저장된 Tailwind 클래스 예시 · 전체 10,942종"],
+        ["click_in_article2", "rounded-b-lg pt-16 px-16 pb-24 sm:pb-40 sm:px-32", "실제 저장된 여백·모양 클래스 예시"],
+        ["click_class 전체 확인값", "pagination-link undefined", "undefined가 문자열 안에 포함된 실제값 · 3,905건"],
+        ["이벤트별 값 종류", "click_in 10,942종 · click_non 1,620종 · click_out 67종", "화면 요소마다 다른 클래스 조합이 저장"]
+      ],
+      click_text: [
+        ["click_in_article2 실제 예시", "이미지 확대보기 HAI가 정리한 기사핵심을 확인하세요", "클릭한 요소에 표시된 실제 문구"],
+        ["click_in_article2 이상 예시", "기사 본문 전체 문자열", "전체의 약 45%"],
+        ["click_non_article2 실제 예시", "오피니언 · 확인 · 로그인", "비기사 화면에서 확인된 값"],
+        ["click_out_article2 실제 예시", "한국일보 홈 · 오피니언 · 검색 · (빈값)", "빈값은 전체의 약 46.3%"]
+      ],
+      click_page_url: [
+        ["click_in_article2 실제 예시", "/news/article/A2026062912180005978", "기사 본문·추천기사 이동 경로"],
+        ["click_non_article2 실제 예시", "/search · /news/opinion", "검색·섹션 화면 이동 경로"],
+        ["click_out_article2 실제 예시", "/auth/login · https://www.youtube.com/thehankookilbo", "로그인·외부 채널 이동 경로"],
+        ["이벤트별 빈값", "click_in 95.4% · click_non 약 37% · click_out 약 35%", "목적지 URL이 저장되지 않은 비율"]
+      ],
+      join_id: [
+        ["login2 실제 예시", "HKYCWETZZU6G", "HK로 시작하는 12자리 코드"],
+        ["login2 등 실제 예시", "b6729ca8-e4a4-46a7-8ecd-6dbb9833cf7f", "UUID 형식"],
+        ["login2", "값 있음 100%", "로그인 시점 회원 식별"],
+        ["logout2 · sign_up2", "(대부분 빈값)", "값 있음 0%에 가까움"]
+      ],
+      click_headline: [
+        ["click_in_article2 정상값", "클릭한 기사 제목 문자열", "대체로 제목 한 건이 저장"],
+        ["click_non_article2 이상값", "기사 본문 전체 문자열", "제목 대신 본문이 저장된 사례"],
+        ["click_non_article2 이상값", "HTML 태그가 포함된 문자열", "제목별 집계 전 제외 필요"],
+        ["click_out_article2 실제값", "(빈값)", "로그인·로그아웃·구독·회원가입 등 제목이 없는 액션"]
+      ],
+      click_article_id: [
+        ["click_in_article2 실제 예시", "201908271065715262", "목적지 URL의 기사 ID와 일치"],
+        ["click_non_article2 실제 예시", "201908271065715262", "기사목록 클릭 시 저장"]
+      ],
+      click_article_edit: [
+        ["click_in_article2", "기사 화면 위치값 13종", "관련영역·플로팅추천영역·탐사보도 등"],
+        ["click_non_article2", "메인 화면 위치값 19종", "메인주요기사·메인프리미엄 등"]
+      ],
+      content_category: [
+        ["기사 소비·클릭·page_view2", "문화·사회·정치·경제·라이프 등", "article_id가 있는 경우 섹션명 수집"],
+        ["article_id가 없는 이벤트", "공란", "정상"]
+      ],
+      first_puble_time: [
+        ["기사 소비·클릭·page_view2", "15:56:00 · 08:26:00", "기사에서 실제 확인된 최초 발행시각"],
+        ["video_start2 · video_end2", "17:33:02 · 20:14:23", "영상에서 실제 확인된 최초 발행시각"],
+        ["session_start2", "(빈값 또는 발행시각)", "article_id 존재 여부와 맞지 않는 일부 채움 사례"]
+      ],
+      last_puble_time: [
+        ["기사 소비·클릭·page_view2", "10:44:00 · 15:56:00", "기사에서 실제 확인된 최종 수정시각"],
+        ["video_start2 · video_end2", "17:33:02 · 20:14:23", "영상에서 실제 확인된 시각"],
+        ["수정 이력 없음", "first_puble_time과 같은 값", "최초 발행시각과 최종 수정시각이 동일"]
+      ],
+      article_length: [
+        ["article_complete2 · article_fever2 · article_scroll2", "972 · 1483 · 13", "실제로 저장된 본문 길이값 예시"],
+        ["click_in_article2 · click_out_article2 · page_view2", "972 · 1483 · 13", "화면 GTM의 숫자값을 그대로 저장"],
+        ["동일 article_id", "예: 972 → 1483", "본문 수정 전후 서로 다른 값이 존재"]
+      ],
+      gtm_uniqueeventid: [
+        ["page_view2 실제 예시", "72 또는 (빈값)", "값이 있는 비율 약 0.2%"],
+        ["session_start2 실제값", "(대부분 빈값)", "값이 있는 비율 약 0.02%"],
+        ["login2 · sign_up2 · sign_out2", "UUID 형식 값", "값이 있는 경우 확인된 형식"],
+        ["click_non_article2", "72 또는 UUID 형식 값", "같은 세션에서 반복된 사례가 존재"]
+      ],
+      article_id: [
+        ["현재 기사 이벤트 실제 예시", "A2024091215180001091", "A로 시작하는 기사 ID"],
+        ["과거 기사 이벤트 실제 예시", "201612011189539024", "2020년 7월 이전 숫자형 기사 ID"],
+        ["영상 이벤트", "V로 시작하는 21자리 값", "영상 콘텐츠 ID"],
+        ["비기사 이벤트", "(빈값)", "기사와 연결되지 않은 이벤트"]
+      ],
+      feature_type: [
+        ["page_view2", "loginWall 또는 no", "로그인월 노출 여부"],
+        ["click_in_article2 · click_out_article2", "loginWall 또는 no", "기사 클릭 시 함께 수집"],
+        ["전체 이벤트", "yes 값 0건", "현재 운영값은 두 종류"]
+      ],
+      last_puble_date: [
+        ["기사 소비·클릭·page_view2 실제 예시", "2023/02/01", "정상 최종 수정일"],
+        ["전체 이상값", "Invalid Date", "75건 확인"],
+        ["전체 이상값", "A2025… 형태의 기사 ID 문자열", "날짜 자리에 기사 ID 4건 확인"]
+      ],
+      event_date: [
+        ["대부분 수집 이벤트 실제 예시", "20260730", "정상 YYYYMMDD 8자리"],
+        ["전체 이상값", "NaNNaNNa", "129건 확인"],
+        ["전체 이상값", "현재보다 미래의 YYYYMMDD 값", "4,025건 확인"]
+      ],
+      hk_type: [
+        ["대부분 수집 이벤트", "iOS · AOS · PC · 모바일웹", "정의된 플랫폼 값"],
+        ["2026년 이후 일부 이벤트", "MOW · mobilweb · 오버웹", "신규·비정형 값"],
+        ["MOW 8,494건", "8,492건 Macintosh 환경", "실제 OS와 함께 확인 필요"]
+      ],
+      operating_system: [
+        ["대부분 수집 이벤트", "Android · iOS · Windows · Macintosh · Chrome OS · Linux", "운영체제명"],
+        ["2026.01 이전", "Android OS · Apple iOS 오매핑 70~90%", "과거 구간"],
+        ["2026.02 이후", "오매핑 0.05% 이하", "개선 반영 후"]
+      ],
+      operating_system_version: [
+        ["대부분 수집 이벤트", "Android 10 · iOS 18.7 · Windows 10 등", "OS명+버전번호"],
+        ["2026.01 이전", "Android OS · Apple iOS 730건", "버전 자리에 OS명 수집"],
+        ["2026.02 이후", "오류 0.05% 이하", "개선 반영 후"]
+      ]
+    };
+
+    const statusReasonMap = {
+      author_name: "화면 바이라인이 아니라 HERB 담당 기자 한 명만 수집됩니다.",
+      article_type: "이벤트 계열에 따라 같은 유형의 한글·영문 표기가 달라집니다.",
+      click_class: "디자인값 위주로 수집돼 클릭 대상을 식별하기 어렵습니다.",
+      click_text: "본문 전체·복수 메뉴·빈값이 클릭 문구로 수집됩니다.",
+      click_page_url: "이벤트별 URL 누락 비율이 35~95.4%로 확인됩니다.",
+      join_id: "HK 코드와 UUID가 갈리는 기준이 아직 확인되지 않았습니다.",
+      click_headline: "일부 클릭에서 제목 대신 본문·HTML이 수집됩니다.",
+      click_article_id: "목적지 URL의 기사 ID와 일치하며 현재 특이사항이 없습니다.",
+      click_article_edit: "정의한 위치값과 실제 화면 위치가 다른 사례가 있습니다.",
+      content_category: "article_id가 있을 때 실제 섹션명이 정상 수집됩니다.",
+      first_puble_time: "대부분 정상이나 일부 세션값의 참조 기준은 불명확합니다.",
+      last_puble_time: "대부분 정상이나 article_id가 없는 세션에도 값이 있습니다.",
+      article_length: "기사 수정 시점에 따라 동일 기사에 복수값이 존재합니다.",
+      gtm_uniqueeventid: "대부분의 이벤트가 빈값이어서 사실상 활용하기 어렵습니다.",
+      article_id: "2020년 7월 전후의 두 가지 정상 형식이 함께 존재합니다.",
+      feature_type: "현재 운영값은 loginWall과 no 두 가지로 확인됩니다.",
+      last_puble_date: "전체적으로 정상이나 파싱 실패값 79건이 존재합니다.",
+      event_date: "전체적으로 정상이나 약 0.00008%의 예외값이 존재합니다.",
+      hk_type: "MOW 등 신규·비정형 플랫폼값이 추가로 발생합니다.",
+      operating_system: "2026년 2월 개선 후 오매핑이 0.05% 이하로 감소했습니다.",
+      operating_system_version: "2026년 2월 개선 후 오류값이 0.05% 이하로 감소했습니다."
+    };
+
+    const valueGuideMap = {
+      author_name: ["many", "값의 종류가 많음", "기사와 기자에 따라 서로 다른 이름이 발생하므로 아래에는 대표 사례만 표시합니다."],
+      article_type: ["category", "정해진 범주형", "일반·단독·속보 등 정해진 유형을 이벤트별 한글·영문 값으로 표시합니다."],
+      click_class: ["many", "값의 종류가 매우 많음", "화면 요소의 CSS 조합에 따라 수많은 값이 발생하므로 아래에는 대표 사례만 표시합니다."],
+      click_text: ["many", "값의 종류가 많음", "사용자가 클릭한 요소의 문구에 따라 값이 달라지므로 아래에는 정상·이상 대표값만 표시합니다."],
+      click_page_url: ["many", "값의 종류가 매우 많음", "이동 목적지마다 URL이 달라지므로 아래에는 이벤트별 대표 경로만 표시합니다."],
+      join_id: ["many", "회원별 고유값", "회원마다 서로 다른 식별값이 발생하며 아래에는 확인된 값의 형식만 표시합니다."],
+      click_headline: ["many", "콘텐츠별 개별값", "클릭한 콘텐츠마다 제목이 달라지므로 아래에는 정상·이상 대표값만 표시합니다."],
+      click_article_id: ["many", "기사별 고유값", "클릭 대상 기사마다 서로 다른 ID가 발생하므로 아래에는 대표 형식만 표시합니다."],
+      click_article_edit: ["category", "정의된 위치 범주", "기사 화면 13종·메인 화면 19종의 위치값 중 이벤트별 대표값을 표시합니다."],
+      content_category: ["category", "운영형 범주", "섹션·코너 목록은 범주형이지만 운영에 따라 새로운 값이 추가될 수 있습니다."],
+      first_puble_time: ["many", "기사별 시각값", "기사·영상의 최초 발행시각에 따라 다양한 값이 발생하므로 대표 형식만 표시합니다."],
+      last_puble_time: ["many", "수정시점별 시각값", "기사 수정시점에 따라 다양한 값이 발생하므로 대표 형식만 표시합니다."],
+      article_length: ["many", "본문별 숫자값", "기사 본문 길이와 수정시점에 따라 수많은 숫자값이 발생합니다."],
+      gtm_uniqueeventid: ["many", "이벤트별 식별값", "정상이라면 이벤트마다 다른 값이 발생해야 하며 아래에는 확인된 형식만 표시합니다."],
+      article_id: ["many", "콘텐츠별 고유값", "기사·영상마다 서로 다른 ID가 발생하므로 전체값이 아닌 형식과 대표 사례를 표시합니다."],
+      feature_type: ["category", "정해진 범주형", "현재 확인된 전체 운영값은 loginWall과 no 두 가지입니다."],
+      last_puble_date: ["many", "콘텐츠별 날짜값", "최종 수정일에 따라 다양한 날짜가 발생하므로 정상 형식과 이상 대표값을 표시합니다."],
+      event_date: ["many", "발생일별 날짜값", "이벤트 발생일에 따라 값이 계속 늘어나므로 정상 형식과 이상 대표값을 표시합니다."],
+      hk_type: ["category", "플랫폼 범주", "정의값 외 신규·비정형 플랫폼값이 추가될 수 있어 목록 변화도 함께 표시합니다."],
+      operating_system: ["category", "운영체제 범주", "운영체제 종류는 범주형이지만 동일 OS의 표기 변형이 함께 존재합니다."],
+      operating_system_version: ["many", "버전별 개별값", "OS와 버전 조합에 따라 다양한 값이 발생하므로 정상 형식과 이상 대표값을 표시합니다."]
+    };
+
+    const currentSupplementMap = {
+      author_name: "공동기고 포함 여부에 따라 기자별 기사 수와 조회수 결과가 달라집니다.",
+      article_type: "한글과 영문 값은 서로 다른 기사유형이 아니라 같은 유형의 표기 차이입니다.",
+      click_class: "별도 구분값이 설정되지 않은 영역은 현재 값만으로 클릭 대상을 구별할 수 없습니다.",
+      click_text: "클릭 횟수는 확인할 수 있지만 사용자가 무엇을 클릭했는지 구분하기 어려운 건이 많습니다.",
+      click_page_url: "빈값에는 원래 이동이 없는 클릭과 URL이 누락된 이동 클릭이 함께 포함될 수 있습니다.",
+      join_id: "두 형식을 같은 회원으로 연결할 수 있는지 확인되기 전에는 회원 단위 통합 집계에 주의가 필요합니다.",
+      click_headline: "제목 단위 집계 전에 본문·HTML 형태의 값을 제외하는 기준이 필요합니다.",
+      click_article_edit: "정의표의 위치명과 실제 화면 위치를 대조한 뒤 영역별 클릭 지표에 사용해야 합니다.",
+      first_puble_time: "기사 성과 계산에는 사용할 수 있지만 article_id가 없는 세션값은 별도로 구분할 필요가 있습니다.",
+      last_puble_time: "복수 시각 자체는 수정 이력에 따른 정상값이며, article_id가 없는 값의 출처만 추가 확인 대상입니다.",
+      article_length: "동일 기사라도 수정 전후 값이 다를 수 있으므로 기사 ID만으로 한 값을 고정하면 차이가 발생합니다.",
+      gtm_uniqueeventid: "컬럼명은 고유 이벤트 ID처럼 보이지만 현재 수집률과 반복값 때문에 식별키로 사용할 수 없습니다.",
+      article_id: "두 형식은 모두 정상 역사 데이터이며 2020년 6~7월 전환기 값만 별도로 구분합니다.",
+      last_puble_date: "정상으로 분류했지만 파싱 실패값 79건은 품질 이력에서 제외하지 않습니다.",
+      event_date: "정상으로 분류했지만 약 0.00008%의 예외값은 발생 원인과 함께 기록합니다.",
+      hk_type: "플랫폼값만으로 실제 기기 환경을 단정하지 않고 운영체제값과 함께 확인해야 합니다.",
+      operating_system: "현재 구간은 대부분 정상이나 2026년 1월 이전 데이터는 같은 기준으로 합산하지 않도록 주의합니다.",
+      operating_system_version: "현재 구간은 대부분 정상이나 과거 운영체제명만 입력된 값은 버전별 집계에서 제외해야 합니다."
+    };
+
+    const expectedDisplayMap = {
+      author_name: {
+        kind: "자유문자형 · 기자명",
+        rows: [["정상 단위", "집계 기준으로 정한 기자명 1명 또는 공동기고자 목록"], ["대표값", "김형준 · 최서진 · 김준형"], ["결정 필요", "대표 기자만 집계 / 공동기고 포함"]]
+      },
+      article_type: {
+        kind: "범주형 · 기사유형 5종",
+        rows: [["기사 소비", "일반 · 단독 · 속보 · 현장 · 링크"], ["조회·클릭", "General · Exclusive · Speed · Scene · Link"], ["대응 관계", "일반↔General · 단독↔Exclusive · 속보↔Speed · 현장↔Scene · 링크↔Link"]]
+      },
+      click_class: {
+        kind: "자유문자형 · 클릭 요소 식별값",
+        rows: [["정상 기준", "기사 제목·로그인·추천기사 등을 구분할 수 있는 값"], ["제외 대상", "px-16 · rounded · transition-colors 등 디자인 속성만 있는 값"]]
+      },
+      click_text: {
+        kind: "자유문자형 · 요소당 문구 1개",
+        rows: [["정상값", "로그인 · 오피니언 · 기사 제목"], ["제외 대상", "기사 본문 전체 · 여러 메뉴가 결합된 값 · 빈값"]]
+      },
+      click_page_url: {
+        kind: "URL형 · 이동 목적지 1개",
+        rows: [["기사 이동", "/news/article/A…"], ["검색·섹션", "/search · /news/opinion"], ["외부 이동", "https://www.youtube.com/…"]]
+      },
+      join_id: {
+        kind: "회원 식별값",
+        rows: [["HK 코드", "HK+10자리 · HKYCWETZZU6G"], ["UUID", "8-4-4-4-12자리 · b6729ca8-e4a4-46a7-8ecd-6dbb9833cf7f"]]
+      },
+      click_headline: {
+        kind: "자유문자형 · 콘텐츠 제목 1개",
+        rows: [["정상값", "사용자가 클릭한 실제 기사·콘텐츠 제목"], ["제외 대상", "기사 본문 전체 · HTML 문자열"]]
+      },
+      click_article_id: {
+        kind: "목적지 기사 식별값",
+        rows: [["정상 기준", "목적지 URL의 article_id와 동일"], ["실제값", "201908271065715262"]]
+      },
+      click_article_edit: {
+        kind: "범주형 · 화면 위치값",
+        rows: [["기사 화면", "관련영역 · 플로팅추천영역 · 탐사보도 등 13종"], ["메인 화면", "메인주요기사2 · 메인프리미엄 등 19종"]]
+      },
+      content_category: {
+        kind: "범주형 · 기사 섹션명",
+        rows: [["대표값", "문화 · 사회 · 정치 · 경제 · 라이프 · 국제 · 지역 · 스포츠 · 오피니언"], ["운영 특성", "신규 섹션·코너값 추가 가능"]]
+      },
+      first_puble_time: {
+        kind: "시간형식 · 최초 발행시각",
+        rows: [["기사", "HHMM00 · 15:56:00 · 08:26:00"], ["영상", "HHMMSS · 17:33:02 · 20:14:23"]]
+      },
+      last_puble_time: {
+        kind: "시간형식 · 최종 수정시각",
+        rows: [["수정 없음", "first_puble_time과 동일"], ["수정 있음", "실제 최종 수정시각 · 10:44:00 · 15:56:00"]]
+      },
+      article_length: {
+        kind: "숫자형 · 본문 글자 수",
+        rows: [["정상값", "이벤트 발생 시점의 글자 수"], ["실제값", "972 · 1483 · 13"], ["변동 가능", "본문 수정 시 동일 article_id에 복수값 발생"]]
+      },
+      gtm_uniqueeventid: {
+        kind: "이벤트 식별값",
+        rows: [["정상 기준", "이벤트마다 서로 다른 값"], ["실제형식", "72 등 숫자 · UUID"], ["제외 대상", "반복값 · 빈값"]]
+      },
+      article_id: {
+        kind: "콘텐츠 식별값",
+        rows: [["현재 기사", "A+20자리 · A2024091215180001091"], ["현재 영상", "V+21자리"], ["과거 콘텐츠", "숫자형 · 201612011189539024"]]
+      },
+      feature_type: {
+        kind: "범주형 · 운영값 2종",
+        rows: [["로그인월 노출", "loginWall"], ["미노출", "no"], ["현재 미발생", "yes"]]
+      },
+      last_puble_date: {
+        kind: "날짜형식 · 최종 수정일",
+        rows: [["정상형식", "YYYY/MM/DD"], ["실제값", "2023/02/01"], ["제외 대상", "Invalid Date · 기사 ID 문자열"]]
+      },
+      event_date: {
+        kind: "날짜형식 · 이벤트 발생일",
+        rows: [["정상형식", "YYYYMMDD 8자리"], ["실제값", "20260730"], ["제외 대상", "NaNNaNNa · 미래 날짜"]]
+      },
+      hk_type: {
+        kind: "범주형 · 플랫폼값",
+        rows: [["정의값", "iOS · AOS · PC · 모바일웹"], ["추가 발생값", "MOW · mobilweb · 오버웹"]]
+      },
+      operating_system: {
+        kind: "범주형 · 운영체제명",
+        rows: [["정상값", "Android · iOS · Windows · Macintosh · Chrome OS · Linux"], ["과거 표기값", "Android OS · Apple iOS"]]
+      },
+      operating_system_version: {
+        kind: "버전형식 · OS명+버전번호",
+        rows: [["정상값", "Android 10 · iOS 18.7 · Windows 10"], ["제외 대상", "Android OS · Apple iOS처럼 버전번호가 없는 값"]]
+      }
+    };
+
+    const statusLabelMap = {
+      "정상": "정상 수집",
+      "유의사항": "해석 유의",
+      "기준 확인": "기준 미확정",
+      "수집 이상": "누락·오수집",
+      "활용 제한": "분석 활용 어려움",
+      "개선 반영": "개선 후 안정화"
+    };
+
+    const changeTypeMap = {
+      author_name: ["수집 기준 확인", ""],
+      article_type: ["변경 확인 중", ""],
+      click_class: ["값 형식 변경", ""],
+      click_text: ["확인된 변경 없음", "none"],
+      click_page_url: ["확인된 변경 없음", "none"],
+      join_id: ["연결 기준 확인", ""],
+      click_headline: ["확인된 변경 없음", "none"],
+      click_article_id: ["확인된 변경 없음", "none"],
+      click_article_edit: ["위치 기준 점검", ""],
+      content_category: ["확인된 변경 없음", "none"],
+      first_puble_time: ["확인된 변경 없음", "none"],
+      last_puble_time: ["확인된 변경 없음", "none"],
+      article_length: ["확인된 변경 없음", "none"],
+      gtm_uniqueeventid: ["확인된 변경 없음", "none"],
+      article_id: ["값 형식 변경", ""],
+      feature_type: ["신규 값 발생", ""],
+      last_puble_date: ["확인된 변경 없음", "none"],
+      event_date: ["확인된 변경 없음", "none"],
+      hk_type: ["신규 값 발생", ""],
+      operating_system: ["개선 반영", "improved"],
+      operating_system_version: ["개선 반영", "improved"]
+    };
+
+    const statusClass = {
+      "정상": "normal",
+      "유의사항": "caution",
+      "기준 확인": "decision",
+      "수집 이상": "issue",
+      "활용 제한": "limited",
+      "개선 반영": "improved"
+    };
+
+    const tabs = document.querySelectorAll(".tab");
+    const panels = document.querySelectorAll(".panel");
+    const tableBody = document.getElementById("fieldTableBody");
+    const navList = document.getElementById("fieldNavList");
+    const detailContent = document.getElementById("detailContent");
+    const searchInput = document.getElementById("searchInput");
+    const statusFilter = document.getElementById("statusFilter");
+
+    function badge(status) {
+      return `<span class="badge ${statusClass[status]}">${statusLabelMap[status] || status}</span>`;
+    }
+
+    function renderExpectedGuide(field) {
+      const guide = expectedDisplayMap[field.name];
+      if (!guide) return formalize(field.expected);
+      return `
+        <span class="expected-guide">
+          <span class="expected-kind">${guide.kind}</span>
+          ${guide.rows.map(row => `
+            <span class="expected-row">
+              <span class="expected-label">${row[0]}</span>
+              <span class="expected-value">${row[1]}</span>
+            </span>`).join("")}
+        </span>`;
+    }
+
+    function formalize(text) {
+      return String(text)
+        .replaceAll("돼야 한다.", "돼야 합니다.")
+        .replaceAll("봐야 한다.", "봐야 합니다.")
+        .replaceAll("수 있다.", "수 있습니다.")
+        .replaceAll("수 없다.", "수 없습니다.")
+        .replaceAll("해야 한다.", "해야 합니다.")
+        .replaceAll("필요하다.", "필요합니다.")
+        .replaceAll("어렵다.", "어렵습니다.")
+        .replaceAll("아니다.", "아닙니다.")
+        .replaceAll("가능하다.", "가능합니다.")
+        .replaceAll("존재한다.", "존재합니다.")
+        .replaceAll("확인된다.", "확인됩니다.")
+        .replaceAll("확인됐다.", "확인됐습니다.")
+        .replaceAll("수집된다.", "수집됩니다.")
+        .replaceAll("기록된다.", "기록됩니다.")
+        .replaceAll("유지된다.", "유지됩니다.")
+        .replaceAll("들어온다.", "들어옵니다.")
+        .replaceAll("나타난다.", "나타납니다.")
+        .replaceAll("남는다.", "남습니다.")
+        .replaceAll("생긴다.", "생깁니다.")
+        .replaceAll("달라진다.", "달라집니다.")
+        .replaceAll("구조다.", "구조입니다.")
+        .replaceAll("정상이다.", "정상입니다.")
+        .replaceAll("상태다.", "상태입니다.")
+        .replaceAll("범위다.", "범위입니다.")
+        .replaceAll("있다.", "있습니다.")
+        .replaceAll("없다.", "없습니다.")
+        .replaceAll("된다.", "됩니다.")
+        .replaceAll("한다.", "합니다.");
+    }
+
+    function renderRepresentativeEventValues(field) {
+      const allRows = eventValueMap[field.name] || [[field.events, field.example, "대표 발생값"]];
+      const rows = allRows;
+      const guide = valueGuideMap[field.name] || ["many", "대표값 표시", "실제 발생값 중 대표 사례만 표시합니다."];
+      return `
+        <div class="event-mini">
+          <span class="value-guide ${guide[0]}"><strong>${guide[1]}</strong>${guide[2]}</span>
+          ${rows.map(row => `
+            <div class="event-mini-row">
+              <span class="event-mini-name">${row[0]}</span>
+              <span class="event-mini-value">${row[1]}</span>
+            </div>`).join("")}
+        </div>`;
+    }
+
+    function switchPanel(panelId) {
+      tabs.forEach(tab => tab.classList.toggle("active", tab.dataset.panel === panelId));
+      panels.forEach(panel => panel.classList.toggle("active", panel.id === panelId));
+      document.getElementById("overviewIntro").classList.toggle("active", panelId === "overviewPanel");
+      window.scrollTo({ top: document.querySelector(".tabs").offsetTop - 66, behavior: "smooth" });
+    }
+
+    function renderSummary() {
+      const counts = fields.reduce((acc, field) => {
+        acc[field.status] = (acc[field.status] || 0) + 1;
+        return acc;
+      }, {});
+      document.getElementById("summaryGrid").innerHTML = `
+        <div class="summary-card lead">
+          <span class="summary-label">현재 작성 범위</span>
+          <span class="summary-number">${fields.length}개 필드</span>
+          <span class="summary-note">전체 컬럼은 varchar(문자형)이며 상세 검증을 진행하고 있습니다.</span>
+        </div>
+        ${["정상","유의사항","기준 확인","수집 이상","활용 제한","개선 반영"].map(status => `
+          <div class="summary-card">
+            <span class="summary-label">${statusLabelMap[status]}</span>
+            <span class="summary-number">${counts[status] || 0}</span>
+            <span class="summary-note">${status === "정상" ? "정의한 규칙과 실제 수집값이 대체로 일치합니다." :
+              status === "유의사항" ? "값은 사용할 수 있지만 복수 형식과 과거 구간 해석에 주의가 필요합니다." :
+              status === "기준 확인" ? "수집 기준 또는 운영 정책의 결정이 필요합니다." :
+              status === "수집 이상" ? "누락·오수집으로 실제값이 정의와 다릅니다." :
+              status === "활용 제한" ? "값이 거의 없거나 의미를 식별하기 어렵습니다." : "개발 수정 후 정상화 여부를 계속 확인합니다."}</span>
+          </div>`).join("")}
+      `;
+    }
+
+    function renderTable() {
+      const term = searchInput.value.trim().toLowerCase();
+      const selected = statusFilter.value;
+      const filtered = fields.filter(field => {
+        const haystack = `${field.name} ${field.definition} ${field.expected} ${field.example} ${field.current} ${field.impact} ${field.status}`.toLowerCase();
+        return (!term || haystack.includes(term)) && (!selected || field.status === selected);
+      });
+
+      tableBody.innerHTML = filtered.map((field) => {
+        const index = fields.indexOf(field) + 1;
+        return `
+          <tr>
+            <td class="row-no">${String(index).padStart(2, "0")}</td>
+            <td><span class="field-name">${field.name}</span><span class="type">varchar · 문자형</span></td>
+            <td>
+              <span class="definition-main">${field.definition}</span>
+              <span class="expected-line"><strong>정상 수집 기준</strong>${renderExpectedGuide(field)}</span>
+            </td>
+            <td>${renderRepresentativeEventValues(field)}</td>
+            <td class="current-text">
+              ${formalize(field.current)}
+              ${currentSupplementMap[field.name] ? `<span class="current-note"><strong>해석</strong> ${currentSupplementMap[field.name]}</span>` : ""}
+            </td>
+            <td>${formalize(field.impact)}</td>
+            <td class="status-cell">${badge(field.status)}<span class="status-help">${statusReasonMap[field.name]}</span></td>
+            <td>
+              <span class="change-tag ${changeTypeMap[field.name][1]}">${changeTypeMap[field.name][0]}</span>
+              <span class="change-date">${field.change.includes("2026") || field.change.includes("2020") ? "최근 기록" : "변경 이력"}</span>
+              ${formalize(field.change)}
+            </td>
+            <td class="detail-col"><button class="detail-button" onclick="openDetail('${field.name}')">변경이력 상세 →</button></td>
+          </tr>`;
+      }).join("");
+    }
+
+    function renderNav(activeName) {
+      navList.innerHTML = fields.map(field => `
+        <button class="${field.name === activeName ? "active" : ""}" onclick="showDetail('${field.name}')">
+          <span>${field.name}</span><span class="nav-dot"></span>
+        </button>`).join("");
+    }
+
+    function renderEventValues(field) {
+      const rows = eventValueMap[field.name] || [[field.events, field.example, "대표 발생값"]];
+      return `
+        <section class="event-values">
+          <h3>수집 이벤트별 발생값</h3>
+          <table class="event-values-table">
+            <thead><tr><th>수집 이벤트</th><th>실제 발생값</th><th>확인 내용</th></tr></thead>
+            <tbody>
+              ${rows.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join("")}</tr>`).join("")}
+            </tbody>
+          </table>
+        </section>`;
+    }
+
+    function renderHistory(field) {
+      if (!field.history.length) {
+        return `<div class="empty-history">상세 변경이력이 생기면 날짜·작업내용·변경 전후 값·검증 결과를 이 영역에 누적합니다.</div>`;
+      }
+      return `
+        <table class="history-table">
+          <thead><tr><th>변경일</th><th>작업 내용</th><th>변경 전</th><th>변경 후</th><th>확인 결과</th></tr></thead>
+          <tbody>
+            ${field.history.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join("")}</tr>`).join("")}
+          </tbody>
+        </table>`;
+    }
+
+    function showDetail(name) {
+      const field = fields.find(item => item.name === name) || fields[0];
+      renderNav(field.name);
+      detailContent.innerHTML = `
+        <div class="detail-heading">
+          <div>
+            <h2>${field.name}</h2>
+            <p>${field.definition} · varchar(문자형)</p>
+          </div>
+          ${badge(field.status)}
+        </div>
+        <div class="detail-grid">
+          <section class="detail-card">
+            <h3>정의·기대값</h3>
+            <div>${renderExpectedGuide(field)}</div>
+          </section>
+          <section class="detail-card">
+            <h3>값이 수집되는 행동 기록</h3>
+            <p>${field.events}</p>
+          </section>
+          <section class="detail-card wide">
+            <h3>현재 실제 수집 상태</h3>
+            <p>${formalize(field.current)}</p>
+          </section>
+          <section class="detail-card">
+            <h3>실제 값 예시</h3>
+            <p><code>${field.example}</code></p>
+          </section>
+          <section class="detail-card">
+            <h3>분석 시 확인할 사항</h3>
+            <p>${formalize(field.check)}</p>
+          </section>
+          <section class="detail-card">
+            <h3>영향받는 지표</h3>
+            <p>${formalize(field.impact)}</p>
+          </section>
+          <section class="detail-card">
+            <h3>변경 이력 요약</h3>
+            <p>${formalize(field.change)}</p>
+          </section>
+        </div>
+        ${renderEventValues(field)}
+        <section class="history">
+          <h3>상세 변경이력</h3>
+          ${renderHistory(field)}
+        </section>
+      `;
+    }
+
+    function openDetail(name) {
+      switchPanel("detailPanel");
+      showDetail(name);
+    }
+
+    tabs.forEach(tab => tab.addEventListener("click", () => switchPanel(tab.dataset.panel)));
+    searchInput.addEventListener("input", renderTable);
+    statusFilter.addEventListener("change", renderTable);
+
+    renderSummary();
+    renderTable();
+    showDetail(fields[0].name);
+
+    const accessForm = document.getElementById("accessForm");
+    const accessPassword = document.getElementById("accessPassword");
+    const accessMessage = document.getElementById("accessMessage");
+    const accessSessionKey = "hmap2-column-definition-access";
+    const accessPasswordHash = "e2c3c78c55c7e565da5d08d1e27587a7abb65321ae8fe02f1c199c5a2d432a59";
+
+    function hasSessionAccess() {
+      try {
+        return sessionStorage.getItem(accessSessionKey) === "granted";
+      } catch (error) {
+        return false;
+      }
+    }
+
+    function unlockDocument(saveSession = true) {
+      document.body.classList.remove("locked");
+      if (saveSession) {
+        try {
+          sessionStorage.setItem(accessSessionKey, "granted");
+        } catch (error) {
+          /* 로컬 파일 환경에서 저장이 제한되면 현재 화면에서만 잠금을 해제합니다. */
+        }
+      }
+    }
+
+    async function sha256(value) {
+      if (!window.crypto || !window.crypto.subtle) return null;
+      const bytes = new TextEncoder().encode(value);
+      const digest = await window.crypto.subtle.digest("SHA-256", bytes);
+      return Array.from(new Uint8Array(digest))
+        .map(byte => byte.toString(16).padStart(2, "0"))
+        .join("");
+    }
+
+    async function passwordMatches(value) {
+      const digest = await sha256(value);
+      if (digest) return digest === accessPasswordHash;
+      return window.btoa(unescape(encodeURIComponent(value))) === "aGFua29va2lsYm8x";
+    }
+
+    if (hasSessionAccess()) {
+      unlockDocument(false);
+    } else {
+      window.requestAnimationFrame(() => accessPassword.focus());
+    }
+
+    accessForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      accessMessage.textContent = "";
+      if (await passwordMatches(accessPassword.value)) {
+        unlockDocument(true);
+        accessPassword.value = "";
+        window.scrollTo({ top: 0, behavior: "auto" });
+        return;
+      }
+      accessMessage.textContent = "비밀번호가 일치하지 않습니다. 다시 입력해 주세요.";
+      accessPassword.select();
+    });
+  </script>
+</body>
+</html>
