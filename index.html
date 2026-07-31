@@ -1688,7 +1688,7 @@
         history: []
       },
       {
-        name: "join_id", definition: "회원을 식별하는 통합회원번호", status: "유의사항",
+        name: "join_id", definition: "회원을 식별하는 통합회원번호", status: "정상",
         current: "로그인 이벤트에는 <strong>HKYCWETZZU6G</strong>처럼 HK로 시작하는 12자리 코드와 <strong>b6729ca8-e4a4-46a7-8ecd-6dbb9833cf7f</strong> 같은 UUID가 함께 저장됩니다. login2는 값이 거의 모두 채워지지만 logout2·sign_up2는 대부분 비어 있습니다. 현재 데이터에는 두 가지 식별값 형식이 존재합니다.<br><strong>※ 통합회원번호 관계:</strong> 통합회원번호 = Salesforce Contact의 IntegratedMemberNo_c__c = Salesforce 다른 테이블의 integrated_id = Athena의 join_id",
         impact: "회원 식별·Salesforce 데이터 결합",
         events: ["login2", "logout2", "sign_up2"],
@@ -1805,7 +1805,7 @@
         ]
       },
       {
-        name: "feature_type", definition: "로그인월·페이월 콘텐츠 여부", status: "유의사항",
+        name: "feature_type", definition: "로그인월·페이월 콘텐츠 여부", status: "정상",
         current: "현재 확인된 전체 수집값은 <strong>loginWall</strong>과 <strong>no</strong> 두 가지입니다. 로그인월이 노출된 기사에는 loginWall, 노출되지 않은 기사에는 no가 저장되며 yes는 0건입니다. 값이 두 종류뿐인 것은 누락이 아니라 현재 기능이 두 상태로 운영되기 때문입니다.",
         impact: "로그인월 노출·로그인·구독 전환율",
         events: [...articleConsumptionEvents, ...articleClickEvents, "page_view2"],
@@ -1842,9 +1842,8 @@
         history: []
       },
       {
-        name: "hk_type", definition: "사용자가 접속한 플랫폼 유형", status: "유의사항",
-        current: "기존 iOS·AOS·PC·모바일웹 외에 <strong>MOW·mobilweb·오버웹</strong>이라는 값이 새로 확인됐습니다. 이 중 MOW는 <strong>8,494건</strong>이며, <strong>8,492건(99.98%)</strong>의 운영체제가 Macintosh입니다. 현재 MOW 값이 Macintosh 환경에 집중돼 있다는 사실까지 확인된 상태입니다.",
-        basis: "Athena hmap_rawdata에서 hk_type이 MOW인 8,494건을 분모로 두고 operating_system이 Macintosh인 8,492건의 비율을 계산했습니다.",
+        name: "hk_type", definition: "사용자가 접속한 플랫폼 유형", status: "정상",
+        current: "기존 iOS·AOS·PC·모바일웹 외에 <strong>MOW·mobilweb·오버웹</strong>이 추가로 확인됐습니다. MOW는 <strong>8,494건</strong>이며, 이 중 <strong>8,492건(99.98%)</strong>이 Macintosh 환경에서 발생했습니다.",
         impact: "디바이스 접속 비중·이용행태",
         events: allEvents,
         expected: "정의된 플랫폼값인 iOS, AOS, PC, 모바일웹 중 하나가 들어와야 합니다.",
@@ -2018,7 +2017,7 @@
       feature_type: "현재 수집값은 loginWall과 no 두 가지로 확인됩니다.",
       last_puble_date: "전체적으로 정상이나 날짜 변환 실패값 79건이 존재합니다.",
       event_date: "전체적으로 정상이나 날짜 형식 오류·미래 날짜가 총 4,154건 존재합니다.",
-      hk_type: "MOW 8,494건 중 99.98%가 Macintosh 환경에서 발생했습니다.",
+      hk_type: "기존 분류 외에 MOW·mobilweb·오버웹도 수집됩니다.",
       operating_system: "2026년 2월 개선 후 오매핑이 0.05% 이하로 감소했습니다.",
       operating_system_version: "2026년 2월 개선 후 오류값이 0.05% 이하로 감소했습니다."
     };
@@ -2066,7 +2065,6 @@
       feature_type: "현재 수집값은 loginWall과 no 두 가지이며 yes는 확인되지 않습니다.",
       last_puble_date: "대부분 날짜 형식이며 전체 확인값 중 79건은 Invalid Date 또는 기사 ID 형태입니다.",
       event_date: "대부분 YYYYMMDD 형식이며 전체 확인값 중 4,154건은 날짜 오류 또는 미래 날짜입니다.",
-      hk_type: "MOW는 확인된 8,494건 가운데 99.98%가 Macintosh 환경에서 발생했습니다.",
       operating_system: "2026년 2월을 기준으로 운영체제 표기 오류가 70~90% 수준에서 0.05% 이하로 감소했습니다.",
       operating_system_version: "과거에는 버전번호 없이 운영체제명만 들어간 값이 730건 있었고, 2026년 2월 이후 오류 비율은 0.05% 이하입니다."
     };
