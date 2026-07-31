@@ -743,7 +743,11 @@
     .badge.improved { color: var(--improved); background: var(--improved-bg); }
 
     .minor-exception {
-      display: inline-block;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1px;
+      max-width: 100%;
       margin-top: 6px;
       padding: 3px 7px;
       border: 1px solid #ead7a7;
@@ -752,12 +756,24 @@
       background: #fff8e6;
       font-size: 9px;
       font-weight: 900;
-      white-space: nowrap;
+      line-height: 1.35;
+      white-space: normal;
+      overflow-wrap: anywhere;
     }
 
     .status-cell .minor-exception {
-      display: block;
       width: fit-content;
+    }
+
+    .minor-exception strong {
+      color: #7a5a10;
+      font-size: 9px;
+    }
+
+    .minor-exception small {
+      color: #937328;
+      font-size: 8.5px;
+      font-weight: 800;
     }
 
     .status-cell { min-width: 0; }
@@ -2347,7 +2363,7 @@
             <td>${field.impact}</td>
             <td class="status-cell">
               ${badge(field.status)}
-              ${field.minorException ? `<span class="minor-exception">예외값 있음 · ${field.minorException}</span>` : ""}
+              ${field.minorException ? `<span class="minor-exception"><strong>예외값 있음</strong><small>${field.minorException}</small></span>` : ""}
               <span class="status-help">${statusReasonMap[field.name]}</span>
             </td>
             <td>
@@ -2405,7 +2421,7 @@
           </div>
           <div>
             ${badge(field.status)}
-            ${field.minorException ? `<span class="minor-exception">예외값 있음 · ${field.minorException}</span>` : ""}
+            ${field.minorException ? `<span class="minor-exception"><strong>예외값 있음</strong><small>${field.minorException}</small></span>` : ""}
           </div>
         </div>
         <div class="detail-grid">
